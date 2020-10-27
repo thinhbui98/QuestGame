@@ -43,7 +43,16 @@ const App = () => {
                         <Text>D.Dap an la </Text>
                     </TouchableOpacity>
                 </View>
+                <View style={styles.footerButton}>
+                    <TouchableOpacity style={styles.quitButton}>
+                        <Text style={styles.titleFooterButton}>Thoat</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.rankButton}>
+                        <Text  style={styles.titleFooterButton}>Xep Hang</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
+            
         </View>
     );
 };
@@ -51,7 +60,8 @@ const App = () => {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
+        justifyContent: 'center',
     },
     backgroundGame: {
         height: '40%',
@@ -81,8 +91,32 @@ const styles = StyleSheet.create({
         height: '15%',
         width: '80%',
         backgroundColor: '#66ccff',
-        marginBottom: 15,
+        marginBottom: 13,
         borderRadius: 15
+    },
+    footerButton: {
+        flexDirection: 'row',
+        justifyContent:'space-between',
+        height:'10%',
+        marginLeft: 10,
+        marginRight: 10,
+        bottom : 20
+    },
+    quitButton: {
+        backgroundColor: 'red',
+        width: '45%',
+        borderRadius: 15,
+        justifyContent:'center',
+        alignItems: 'center'
+    },
+    rankButton: {
+        backgroundColor: 'white',
+        width: '45%',
+        borderRadius: 15,
+        justifyContent:'center',
+        alignItems: 'center'
+    },
+    titleFooterButton: {
     }
 });
 
