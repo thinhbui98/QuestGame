@@ -21,14 +21,20 @@ const App = () => {
             <StatusBar hidden={true} />
             <View style={styles.backgroundGame}>
                 <ImageBackground source={require('./assets/image/demo.png')} style={styles.demoGame}>
-
+                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'yellow',marginTop:15, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
+                        <Text style={{fontSize: 20}}>120</Text>
+                    </View>
+                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:15, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
+                        <Text style={{fontSize: 20}}>10</Text>
+                    </View>
                 </ImageBackground>
-
             </View>
             <View style={styles.backgroundQuest}>
-                <View style={styles.quest}>
-                    <Text>abc</Text>
-                </View>
+                <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
+                    <Text style={{fontSize: 20,color:'white'}}>今何時ですか？</Text>
+                </ImageBackground>
                 <View style={styles.answer}>
                     <TouchableOpacity style={styles.answerButton}>
                         <Text>A.Dap an la </Text>
@@ -69,19 +75,22 @@ const styles = StyleSheet.create({
     },
     demoGame: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        flexDirection: 'row'
     },
     backgroundQuest: {
         height: '60%',
         backgroundColor: '#00ffbf',
     },
     quest: {
-        backgroundColor: '#cc9900',
         justifyContent: 'center',
         alignItems: 'center',
-        height:'20%'
+        height: 90,
+        width: '100%',
+        marginTop: 10
     },
     answer: {
+        marginTop: -15,
         justifyContent: 'center',
         alignItems: 'center',
     },
