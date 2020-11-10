@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import {
     Image,
     ImageBackground,
@@ -15,13 +15,14 @@ import {
 const App = () => {
     const windowWidth = useWindowDimensions().width;
     const windowHeight = useWindowDimensions().height;
+    const [startGame, setStartGame] = useState(false);
 
     return (
         <View style={styles.background}>
             <StatusBar hidden={true} />
             <View style={styles.backgroundGame}>
                 <ImageBackground source={require('./assets/image/demo.png')} style={styles.demoGame}>
-                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'yellow',marginTop:15, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:15, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
                         <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
                         <Text style={{fontSize: 20}}>120</Text>
                     </View>
@@ -32,33 +33,40 @@ const App = () => {
                 </ImageBackground>
             </View>
             <View style={styles.backgroundQuest}>
-                <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
+                {startGame ? (
+                    <View>
+                        <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
                     <Text style={{fontSize: 20,color:'white'}}>今何時ですか？</Text>
-                </ImageBackground>
-                <View style={styles.answer}>
-                    <TouchableOpacity style={styles.answerButton}>
-                        <Text>A.Dap an la </Text>
+                    </ImageBackground>
+                        <View style={styles.answer}>
+                            <TouchableOpacity style={styles.answerButton}>
+                                <Text>A.Dap an la </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.answerButton}>
+                                <Text>B.Dap an la </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.answerButton}>
+                                <Text>C.Dap an la </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.answerButton}>
+                                <Text>D.Dap an la </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.footerButton}>
+                            <TouchableOpacity style={styles.quitButton}>
+                                <Text style={styles.titleFooterButton}>Thoat</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.rankButton}>
+                                <Text  style={styles.titleFooterButton}>Xep Hang</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ) : (
+                    <TouchableOpacity style={styles.startButton} onPress={() => setStartGame(true)}>
+                        <Text style={{color:'white'}}>Start Game</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton}>
-                        <Text>B.Dap an la </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton}>
-                        <Text>C.Dap an la </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton}>
-                        <Text>D.Dap an la </Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.footerButton}>
-                    <TouchableOpacity style={styles.quitButton}>
-                        <Text style={styles.titleFooterButton}>Thoat</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rankButton}>
-                        <Text  style={styles.titleFooterButton}>Xep Hang</Text>
-                    </TouchableOpacity>
-                </View>
+                )}
             </View>
-            
         </View>
     );
 };
@@ -81,6 +89,7 @@ const styles = StyleSheet.create({
     backgroundQuest: {
         height: '60%',
         backgroundColor: '#00ffbf',
+        justifyContent: 'center'
     },
     quest: {
         justifyContent: 'center',
@@ -124,6 +133,16 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         justifyContent:'center',
         alignItems: 'center'
+    },
+    startButton: {
+        backgroundColor:'red',
+        width: '80%',
+        height:'10%',
+        justifyContent: 'center',
+        alignSelf: 'center',
+        alignItems:'center',
+        borderRadius: 15
+        
     },
     titleFooterButton: {
     }
