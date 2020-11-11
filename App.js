@@ -8,14 +8,48 @@ import {
     Text,
     StatusBar,
     TouchableWithoutFeedback,
-    TouchableOpacity,
-    useWindowDimensions
+    TouchableOpacity
 } from 'react-native';
 
+const data = [
+    {
+        'question': 'A la ki tu nao trong bang chu cai?',
+        'answer': 'あ'
+    },
+    {
+        'question': 'I la ki tu nao trong bang chu cai?',
+        'answer': 'い'
+    },
+    {
+        'question': 'A la ki tu nao trong bang chu cai?',
+        'answer': 'う'
+    },
+    {
+        'question': 'A la ki tu nao trong bang chu cai?',
+        'answer': 'え'
+    },
+    {
+        'question': 'A la ki tu nao trong bang chu cai?',
+        'answer': 'お'
+    }
+];
+
+const hiragana = [
+    'あ', 'い', 'う', 'え', 'お',
+    'か', 'き', 'く', 'け', 'こ',
+];
+
 const App = () => {
-    const windowWidth = useWindowDimensions().width;
-    const windowHeight = useWindowDimensions().height;
+    //state
     const [startGame, setStartGame] = useState(false);
+    const [questNum, setQuestNum] = useState(0);
+
+    const questions = data[questNum].question;
+    const answer = [data[questNum].answer];
+
+    const chooseAnswer = (answer) => {
+        alert(answer)
+    }
 
     return (
         <View style={styles.background}>
@@ -36,10 +70,10 @@ const App = () => {
                 {startGame ? (
                     <View>
                         <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
-                    <Text style={{fontSize: 20,color:'white'}}>今何時ですか？</Text>
+                    <Text style={{fontSize: 20,color:'white'}}>{questions}</Text>
                     </ImageBackground>
                         <View style={styles.answer}>
-                            <TouchableOpacity style={styles.answerButton}>
+                            <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(0)}>
                                 <Text>A.Dap an la </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.answerButton}>
