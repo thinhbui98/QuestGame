@@ -1,5 +1,6 @@
 import React,{ useState } from 'react';
 import {
+    Animated,
     Image,
     ImageBackground,
     StyleSheet,
@@ -138,6 +139,7 @@ const App = () => {
     const quitGame = () => {
         setQuestNum(0);
         setScore(0);
+        data.sort(() => Math.random() - 0.5)
         setVisibleResult(!visibleResult);
     }
 
@@ -151,18 +153,9 @@ const App = () => {
 
     const Start = () => {
         return(
-            <Overlay isVisible={visibleStartGame} overlayStyle={{backgroundColor:'#ffffff',height:'50%',width:'80%'}}>
+            <Overlay isVisible={visibleStartGame} overlayStyle={styles.modalStartButton}>
                 <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={{color:'white',fontSize:26,fontWeight:'bold'}}>Start Game</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={{color:'white',fontSize:26,fontWeight:'bold'}}>Start Game</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={{color:'white',fontSize:26,fontWeight:'bold'}}>Start Game</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={{color:'white',fontSize:26,fontWeight:'bold'}}>Start Game</Text>
+                    <Text style={styles.textStartButton}>Start Game</Text>
                 </TouchableOpacity>
             </Overlay>
         );
@@ -170,12 +163,12 @@ const App = () => {
 
     const Result = () => {
         return(
-            <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={{height:'45%',width:'70%',borderRadius:15}}>
-                <View style={{justifyContent:'center',alignItems:'center',height:'20%'}}>
-                    <Text style={{fontSize:30,fontWeight:'bold'}}>Your Score</Text>
+            <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={styles.modalResult}>
+                <View style={styles.headerResult}>
+                    <Text style={styles.textHeaderResult}>Your Score</Text>
                 </View>
-                <View style={{alignItems:'center',height:'60%'}}>
-                    <Text style={{fontSize:120, color:'red'}}>{score}</Text>
+                <View style={styles.bodyResult}>
+                    <Text style={styles.scoreResult}>{score}</Text>
                     <Text style={{fontSize:18}}>You answer correctly {score} / {data.length}</Text>
                 </View>
                 <View style={{flexDirection: 'row',justifyContent:'space-around',height:'20%'}}>
@@ -227,47 +220,51 @@ const App = () => {
             <StatusBar hidden={true} />
             <Start />
             <View style={styles.backgroundGame}>
-                <ImageBackground source={require('./assets/image/demo.png')} style={styles.demoGame}>
-                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
-                        <Text style={{fontSize: 20}}>120</Text>
+                <ImageBackground source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: '44%'}}>
+                    <View style={{top: 180,flexDirection: 'row'}}>
+                        <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                            <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
+                            <Text style={{fontSize: 20}}>120</Text>
+                        </View>
+                        <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                            <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
+                            <Text style={{fontSize: 20}}>{score}</Text>
+                        </View>
                     </View>
-                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
-                        <Text style={{fontSize: 20}}>10</Text>
-                    </View>
+                    
+                    <Animated.Image source={require('./assets/image/character_male.gif')} style={{height: 80, width:36, top:'64%'}} />
                 </ImageBackground>
             </View>
             <View style={styles.backgroundQuest}>
-            <View>
-                <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
-                <Text style={{fontSize: 20,color:'white'}}>{questions}</Text>
-                </ImageBackground>
-                <View style={styles.answer}>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[0])}>
-                        <Text style={styles.answerText}>{answer[0]}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[1])}>
-                        <Text style={styles.answerText}>{answer[1]}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[2])}>
-                        <Text style={styles.answerText}>{answer[2]}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[3])}>
-                        <Text style={styles.answerText}>{answer[3]}</Text>
-                    </TouchableOpacity>
+                <View>
+                    <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
+                    <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
+                    </ImageBackground>
+                    <View style={styles.answer}>
+                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[0])}>
+                            <Text style={styles.answerText}>{answer[0]}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[1])}>
+                            <Text style={styles.answerText}>{answer[1]}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[2])}>
+                            <Text style={styles.answerText}>{answer[2]}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[3])}>
+                            <Text style={styles.answerText}>{answer[3]}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.footerButton}>
+                        <TouchableOpacity style={styles.quitButton}>
+                            <Text style={styles.titleQuitButton}>Quit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
+                            <Text  style={styles.titleRankButton}>Rank</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.footerButton}>
-                    <TouchableOpacity style={styles.quitButton}>
-                        <Text style={styles.titleQuitButton}>Quit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
-                        <Text  style={styles.titleRankButton}>Rank</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <Result />
-            <Rank />
+                <Result />
+                <Rank />
             </View>
         </View>
     );
@@ -283,9 +280,11 @@ const styles = StyleSheet.create({
         height: '40%',
         backgroundColor: 'black'
     },
-    demoGame: {
-        height: '100%',
-        width: '100%',
+    imageGame: {
+        height: 1920,
+        width: 1080,
+        bottom: 1500,
+        // left:300,
         flexDirection: 'row'
     },
     backgroundQuest: {
@@ -342,11 +341,42 @@ const styles = StyleSheet.create({
     },
     startButton: {
         backgroundColor: '#ff0000',
-        width: '100%',
-        height: '20%',
         justifyContent: 'center',
-        alignItems:'center',
+        alignItems: 'center',
+    },
+    modalStartButton: {
+        backgroundColor: '#ff0000',
+        height: '7%',
+        width: '70%',
+        borderRadius: 15,
+        justifyContent: 'center'
+    },
+    textStartButton: {
+        color: 'white',
+        fontSize: 26,
+        fontWeight: 'bold'
+    },
+    modalResult: {
+        height: '45%',
+        width: '70%',
         borderRadius: 15
+    },
+    headerResult: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '20%'
+    },
+    textHeaderResult: {
+        fontSize: 30,
+        fontWeight: 'bold'
+    },
+    bodyResult: {
+        alignItems: 'center',
+        height: '60%'
+    },
+    scoreResult: {
+        fontSize: 120, 
+        color: 'red'
     },
     titleQuitButton: {
         color: '#ffffff',
