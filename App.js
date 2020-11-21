@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React,{ useState, useRef } from 'react';
 import {
     Animated,
     Image,
@@ -10,7 +10,8 @@ import {
     StatusBar,
     TouchableWithoutFeedback,
     TouchableOpacity,
-    VirtualizedList
+    VirtualizedList,
+    useWindowDimensions
 } from 'react-native';
 import { Button, Overlay } from 'react-native-elements';
 
@@ -82,6 +83,26 @@ const data = [
     {
         'question': 'O la ki tu nao trong bang chu cai?',
         'answer': 'お'
+    },
+    {
+        'question': 'Ka la ki tu nao trong bang chu cai?',
+        'answer': 'か'
+    },
+    {
+        'question': 'Ki la ki tu nao trong bang chu cai?',
+        'answer': 'き'
+    },
+    {
+        'question': 'Ku la ki tu nao trong bang chu cai?',
+        'answer': 'く'
+    },
+    {
+        'question': 'Ke la ki tu nao trong bang chu cai?',
+        'answer': 'け'
+    },
+    {
+        'question': 'Ko la ki tu nao trong bang chu cai?',
+        'answer': 'こ'
     }
 ];
 
@@ -97,6 +118,21 @@ const App = () => {
     const [visibleStartGame, setVisibleStartGame] = useState(true);
     const [visibleResult, setVisibleResult] = useState(false);
     const [visibleRank, setVisibleRank] = useState(false);
+    const [visibleQuest, setvisibleQuest] = useState(false);
+    const [tempCharaterLeftAnimated, setTempCharaterLeftAnimated] = useState(140);
+    const [tempCharaterTopAnimated, setTempCharaterTopAnimated] = useState(270);
+    const [characterStatus, setcharacterStatus] = useState(false);
+
+    //animated
+    //trang thai dau tien tren ios
+    const charaterLeftAnimated = useRef(new Animated.Value(0)).current;
+    const charaterTopAnimated = useRef(new Animated.Value(290)).current;
+    const backgroundRightAnimated = useRef(new Animated.Value(0)).current;
+    const backgroundBottomAnimated = useRef(new Animated.Value(180)).current;
+
+    //demension
+    const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
 
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
@@ -118,6 +154,85 @@ const App = () => {
     const chooseAnswer = (answer) => {
         if (answer == data[questNum].answer) {
             setScore(score + 1);
+            setcharacterStatus(true);
+            setvisibleQuest(false);
+            if (score < 1) {
+                //Lan dau tien di chuyen nhan vat
+                Animated.timing(charaterLeftAnimated, {
+                    toValue: windowWidth/4,
+                    duration: 3000,
+                }).start(( {finished} ) => {
+                    if (finished) {
+                        Animated.timing(charaterLeftAnimated, {
+                            toValue: tempCharaterLeftAnimated,
+                            duration: 2000,
+                        }).start(( {finished} ) => {
+                            if (finished) {
+                                console.log('charaterLeftAnimated stop')
+                            }
+                        });
+                        Animated.timing(charaterTopAnimated, {
+                            toValue: tempCharaterTopAnimated,
+                            duration: 2000,
+                        }).start(( {finished} ) => { 
+                            if (finished) {
+                                console.log('charaterTopAnimated stop')
+                                setvisibleQuest(true);
+                                setTempCharaterLeftAnimated(tempCharaterLeftAnimated + 20)
+                                setTempCharaterTopAnimated(tempCharaterTopAnimated - 10)
+                            }
+                        });
+                    }
+                });
+            } else {
+                //Cac lan tiep theo
+                setTempCharaterLeftAnimated(tempCharaterLeftAnimated + 20)
+                setTempCharaterTopAnimated(tempCharaterTopAnimated - 10)
+                console.log('tempCharaterLeftAnimated',tempCharaterLeftAnimated);
+                console.log('setTempCharaterTopAnimated',tempCharaterTopAnimated);
+                Animated.timing(charaterLeftAnimated, {
+                    toValue: tempCharaterLeftAnimated,
+                    duration: 2000,
+                }).start(( {finished} ) => {
+                    if (finished) {
+                        console.log('left stop')
+                    }
+                });
+                Animated.timing(charaterTopAnimated, {
+                    toValue: tempCharaterTopAnimated,
+                    duration: 2000,
+                }).start(( {finished} ) => { 
+                    //di chuyen background va nhan vat theo so diem
+                    if (finished) {
+                        setvisibleQuest(true);
+                        // Animated.timing(backgroundRightAnimated, {
+                        //     toValue: 20,
+                        //     duration: 1000,
+                        // }).start(( {finished} ) => {
+                        //     if (finished) {
+                        //         console.log('left stop')
+                        //     }
+                        // });
+                        // Animated.timing(backgroundBottomAnimated, {
+                        //     toValue: 160,
+                        //     duration: 1000,
+                        // }).start(( {finished} ) => { 
+                        //     if (finished) {
+                        //         console.log('bottom stop')
+                        //     }
+                        // });
+
+                        // Animated.timing(charaterTopAnimated, {
+                        //     toValue: 270,
+                        //     duration: 1000,
+                        // }).start(( {finished} ) => {
+                        //     if (finished) {
+                        //         console.log('left stop')
+                        //     }
+                        // });
+                    }
+                });
+            }
         } else {
             setVisibleResult(!visibleResult);
         }
@@ -140,7 +255,27 @@ const App = () => {
         setQuestNum(0);
         setScore(0);
         data.sort(() => Math.random() - 0.5)
-        setVisibleResult(!visibleResult);
+        setVisibleResult(false);
+
+        Animated.timing(charaterLeftAnimated, {
+            toValue: 0,
+            duration: 0,
+        }).start();
+
+        Animated.timing(charaterTopAnimated, {
+            toValue: 290,
+            duration: 0,
+        }).start();
+
+        Animated.timing(backgroundRightAnimated, {
+            toValue: 0,
+            duration: 0,
+        }).start();
+
+        Animated.timing(backgroundBottomAnimated, {
+            toValue: 180,
+            duration: 0,
+        }).start();
     }
 
     const modalRank = () => {
@@ -149,6 +284,7 @@ const App = () => {
 
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
+        setvisibleQuest(!visibleQuest);
     }
 
     const Start = () => {
@@ -220,25 +356,24 @@ const App = () => {
             <StatusBar hidden={true} />
             <Start />
             <View style={styles.backgroundGame}>
-                <ImageBackground source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: '44%'}}>
-                    <View style={{top: 180,flexDirection: 'row'}}>
-                        <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                            <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
-                            <Text style={{fontSize: 20}}>120</Text>
-                        </View>
-                        <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                            <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
-                            <Text style={{fontSize: 20}}>{score}</Text>
-                        </View>
+                <Animated.Image source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
+                <View style={{top: -540,flexDirection: 'row'}}>
+                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
+                        <Text style={{fontSize: 20}}>120</Text>
                     </View>
-                    
-                    <Animated.Image source={require('./assets/image/character_male.gif')} style={{height: 80, width:36, top:'64%'}} />
-                </ImageBackground>
+                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
+                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
+                        <Text style={{fontSize: 20}}>{score}</Text>
+                    </View>
+                </View>
+                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_stay.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
             </View>
             <View style={styles.backgroundQuest}>
+            {visibleQuest ? (
                 <View>
                     <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
-                    <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
+                        <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
                     </ImageBackground>
                     <View style={styles.answer}>
                         <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[0])}>
@@ -255,7 +390,7 @@ const App = () => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.footerButton}>
-                        <TouchableOpacity style={styles.quitButton}>
+                        <TouchableOpacity style={styles.quitButton} onPress={quitGame}>
                             <Text style={styles.titleQuitButton}>Quit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
@@ -263,9 +398,13 @@ const App = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <Result />
-                <Rank />
+            ) : (
+                <View></View>
+            )}
+                
             </View>
+            <Result />
+            <Rank />
         </View>
     );
 };
@@ -311,7 +450,7 @@ const styles = StyleSheet.create({
         width: '80%',
         backgroundColor: '#66ccff',
         marginBottom: 13,
-        borderRadius: 15
+        borderRadius: 10
     },
     answerText:{
         fontWeight: 'bold',
@@ -328,14 +467,14 @@ const styles = StyleSheet.create({
     quitButton: {
         backgroundColor: 'red',
         width: '45%',
-        borderRadius: 15,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
     },
     rankButton: {
         backgroundColor: 'white',
         width: '45%',
-        borderRadius: 15,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
     },
