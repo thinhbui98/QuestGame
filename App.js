@@ -11,7 +11,8 @@ import {
     TouchableWithoutFeedback,
     TouchableOpacity,
     VirtualizedList,
-    useWindowDimensions
+    useWindowDimensions,
+    LogBox
 } from 'react-native';
 import { Button, Overlay } from 'react-native-elements';
 
@@ -111,6 +112,7 @@ const hiragana = [
     'か', 'き', 'く', 'け', 'こ',
 ];
 
+LogBox.ignoreAllLogs();
 const App = () => {
     //state
     const [questNum, setQuestNum] = useState(0);
@@ -143,13 +145,14 @@ const App = () => {
         let rand = Math.floor(Math.random() * hiragana.length);
         if(answer.indexOf(hiragana[rand]) == -1){
             if(hiragana[rand] != answer[0] && rand != temp){
-            answer.push(hiragana[rand]);
-            answer.sort(() => Math.random() - 0.5);
-            temp = rand;
-            i++;
+                answer.push(hiragana[rand]);
+                answer.sort(() => Math.random() - 0.5);
+                temp = rand;
+                i++;
             }
         }
     }
+
 
     const chooseAnswer = (answer) => {
         if (answer == data[questNum].answer) {
@@ -195,7 +198,7 @@ const App = () => {
                     duration: 2000,
                 }).start(( {finished} ) => {
                     if (finished) {
-                        console.log('left stop')
+                        console.log('tempCharaterLeftAnimated2 stop')
                     }
                 });
                 Animated.timing(charaterTopAnimated, {
@@ -205,31 +208,47 @@ const App = () => {
                     //di chuyen background va nhan vat theo so diem
                     if (finished) {
                         setvisibleQuest(true);
-                        // Animated.timing(backgroundRightAnimated, {
-                        //     toValue: 20,
-                        //     duration: 1000,
-                        // }).start(( {finished} ) => {
-                        //     if (finished) {
-                        //         console.log('left stop')
-                        //     }
-                        // });
-                        // Animated.timing(backgroundBottomAnimated, {
-                        //     toValue: 160,
-                        //     duration: 1000,
-                        // }).start(( {finished} ) => { 
-                        //     if (finished) {
-                        //         console.log('bottom stop')
-                        //     }
-                        // });
+                        if (tempCharaterLeftAnimated > windowWidth/2) {
+                            setTempCharaterLeftAnimated(tempCharaterLeftAnimated - 120);
+                            setTempCharaterTopAnimated(tempCharaterTopAnimated + 60);
+                            console.log('tempCharaterLeftAnimated2',tempCharaterLeftAnimated);
+                            console.log('setTempCharaterTopAnimated2',tempCharaterTopAnimated);
+                            //di chuyen background
+                            Animated.timing(backgroundRightAnimated, {
+                                toValue: 150,
+                                duration: 1000,
+                            }).start(( {finished} ) => {
+                                if (finished) {
+                                    console.log('backgroundRightAnimated stop')
+                                }
+                            });
+                            Animated.timing(backgroundBottomAnimated, {
+                                toValue: 120,
+                                duration: 1000,
+                            }).start(( {finished} ) => { 
+                                if (finished) {
+                                    console.log('backgroundBottomAnimated stop')
+                                }
+                            });
 
-                        // Animated.timing(charaterTopAnimated, {
-                        //     toValue: 270,
-                        //     duration: 1000,
-                        // }).start(( {finished} ) => {
-                        //     if (finished) {
-                        //         console.log('left stop')
-                        //     }
-                        // });
+                            //di chuyen nhan vat
+                            Animated.timing(charaterLeftAnimated, {
+                                toValue: tempCharaterLeftAnimated - 160,
+                                duration: 1000,
+                            }).start(( {finished} ) => {
+                                if (finished) {
+                                    console.log('charaterLeftAnimated stop')
+                                }
+                            });
+                            Animated.timing(charaterTopAnimated, {
+                                toValue: tempCharaterTopAnimated + 60,
+                                duration: 1000,
+                            }).start(( {finished} ) => {
+                                if (finished) {
+                                    console.log('left stop')
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -256,7 +275,8 @@ const App = () => {
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(false);
-
+        setTempCharaterLeftAnimated(140);
+        setTempCharaterTopAnimated(270);
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
