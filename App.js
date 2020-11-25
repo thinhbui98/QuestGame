@@ -1,4 +1,4 @@
-import React,{ useState, useRef } from 'react';
+import React,{ useState, useRef, useEffect, useLayoutEffect } from 'react';
 import {
     Animated,
     Image,
@@ -14,7 +14,7 @@ import {
     useWindowDimensions,
     LogBox
 } from 'react-native';
-import { Button, Overlay } from 'react-native-elements';
+import { Root, Overlay, ListItem, Left } from 'react-native-elements';
 
 const rank = [
     {
@@ -104,15 +104,64 @@ const data = [
     {
         'question': 'Ko la ki tu nao trong bang chu cai?',
         'answer': 'こ'
-    }
+    },
+    {
+        'question': 'Sa la ki tu nao trong bang chu cai?',
+        'answer': 'さ'
+    },
+    {
+        'question': 'Shi la ki tu nao trong bang chu cai?',
+        'answer': 'し'
+    },
+    {
+        'question': 'Su la ki tu nao trong bang chu cai?',
+        'answer': 'す'
+    },
+    {
+        'question': 'Se la ki tu nao trong bang chu cai?',
+        'answer': 'せ'
+    },
+    {
+        'question': 'So la ki tu nao trong bang chu cai?',
+        'answer': 'そ'
+    },
+    {
+        'question': 'Ta la ki tu nao trong bang chu cai?',
+        'answer': 'た'
+    },
+    {
+        'question': 'Chi la ki tu nao trong bang chu cai?',
+        'answer': 'ち'
+    },
+    {
+        'question': 'Tsu la ki tu nao trong bang chu cai?',
+        'answer': 'つ'
+    },
+    {
+        'question': 'Te la ki tu nao trong bang chu cai?',
+        'answer': 'て'
+    },
+    {
+        'question': 'To la ki tu nao trong bang chu cai?',
+        'answer': 'と'
+    },
 ];
 
 const hiragana = [
     'あ', 'い', 'う', 'え', 'お',
     'か', 'き', 'く', 'け', 'こ',
+    'さ', 'し', 'す', 'せ', 'そ',
+    'た', 'ち', 'つ', 'て', 'と',
 ];
 
 LogBox.ignoreAllLogs();
+
+var tempCharaterLeftAnimated = 100,
+    tempCharaterTopAnimated = 290,
+    tempBackgroundRightAnimated = 0,
+    tempBackgroundBottomAnimated = 0,
+    movingBackground = 0
+
 const App = () => {
     //state
     const [questNum, setQuestNum] = useState(0);
@@ -121,8 +170,6 @@ const App = () => {
     const [visibleResult, setVisibleResult] = useState(false);
     const [visibleRank, setVisibleRank] = useState(false);
     const [visibleQuest, setvisibleQuest] = useState(false);
-    const [tempCharaterLeftAnimated, setTempCharaterLeftAnimated] = useState(140);
-    const [tempCharaterTopAnimated, setTempCharaterTopAnimated] = useState(270);
     const [characterStatus, setcharacterStatus] = useState(false);
 
     //animated
@@ -139,8 +186,7 @@ const App = () => {
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
 
-    let i = 0,
-        temp;
+    let i = 0, temp;
     while (i < 3) {
         let rand = Math.floor(Math.random() * hiragana.length);
         if(answer.indexOf(hiragana[rand]) == -1){
@@ -153,8 +199,7 @@ const App = () => {
         }
     }
 
-
-    const chooseAnswer = (answer) => {
+    const chooseAnswer = answer => {
         if (answer == data[questNum].answer) {
             setScore(score + 1);
             setcharacterStatus(true);
@@ -163,12 +208,12 @@ const App = () => {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
                     toValue: windowWidth/4,
-                    duration: 3000,
+                    duration: 0, //3000
                 }).start(( {finished} ) => {
                     if (finished) {
                         Animated.timing(charaterLeftAnimated, {
                             toValue: tempCharaterLeftAnimated,
-                            duration: 2000,
+                            duration: 0, //2000
                         }).start(( {finished} ) => {
                             if (finished) {
                                 console.log('charaterLeftAnimated stop')
@@ -176,26 +221,22 @@ const App = () => {
                         });
                         Animated.timing(charaterTopAnimated, {
                             toValue: tempCharaterTopAnimated,
-                            duration: 2000,
+                            duration: 0, //2000
                         }).start(( {finished} ) => { 
                             if (finished) {
                                 console.log('charaterTopAnimated stop')
                                 setvisibleQuest(true);
-                                setTempCharaterLeftAnimated(tempCharaterLeftAnimated + 20)
-                                setTempCharaterTopAnimated(tempCharaterTopAnimated - 10)
                             }
                         });
                     }
                 });
             } else {
                 //Cac lan tiep theo
-                setTempCharaterLeftAnimated(tempCharaterLeftAnimated + 20)
-                setTempCharaterTopAnimated(tempCharaterTopAnimated - 10)
-                console.log('tempCharaterLeftAnimated',tempCharaterLeftAnimated);
-                console.log('setTempCharaterTopAnimated',tempCharaterTopAnimated);
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20;
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
-                    duration: 2000,
+                    duration: 0, //2000
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('tempCharaterLeftAnimated2 stop')
@@ -203,49 +244,74 @@ const App = () => {
                 });
                 Animated.timing(charaterTopAnimated, {
                     toValue: tempCharaterTopAnimated,
-                    duration: 2000,
+                    duration: 0, //2000
                 }).start(( {finished} ) => { 
                     //di chuyen background va nhan vat theo so diem
                     if (finished) {
                         setvisibleQuest(true);
                         if (tempCharaterLeftAnimated > windowWidth/2) {
-                            setTempCharaterLeftAnimated(tempCharaterLeftAnimated - 120);
-                            setTempCharaterTopAnimated(tempCharaterTopAnimated + 60);
-                            console.log('tempCharaterLeftAnimated2',tempCharaterLeftAnimated);
-                            console.log('setTempCharaterTopAnimated2',tempCharaterTopAnimated);
+                            movingBackground = movingBackground + 1;
+                            switch (movingBackground) {
+                                case 1:
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
+                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
+                                    break;
+                                case 2: 
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 80;
+                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 80;
+                                default:
+                                    break;
+                            }
+                            // if (movingBackground == 1) {
+                            //     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 160;
+                            //     tempCharaterTopAnimated = tempCharaterTopAnimated + 60;
+                            //     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
+                            //     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 120;
+                            // } else if ( ) {
+                            //     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
+                            //     tempCharaterTopAnimated = tempCharaterTopAnimated + 80;
+                            //     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
+                            //     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 80;
+                            // }
+                            console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
+                            console.log('tempBackgroundBottomAnimated',tempBackgroundBottomAnimated);
                             //di chuyen background
                             Animated.timing(backgroundRightAnimated, {
-                                toValue: 150,
+                                toValue: tempBackgroundRightAnimated,
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
-                                    console.log('backgroundRightAnimated stop')
+                                    console.log('backgroundRightAnimated1 stop')
                                 }
                             });
                             Animated.timing(backgroundBottomAnimated, {
-                                toValue: 120,
+                                toValue: tempBackgroundBottomAnimated,
                                 duration: 1000,
                             }).start(( {finished} ) => { 
                                 if (finished) {
-                                    console.log('backgroundBottomAnimated stop')
+                                    console.log('backgroundBottomAnimated1 stop')
                                 }
                             });
 
                             //di chuyen nhan vat
                             Animated.timing(charaterLeftAnimated, {
-                                toValue: tempCharaterLeftAnimated - 160,
+                                toValue: tempCharaterLeftAnimated,
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
-                                    console.log('charaterLeftAnimated stop')
+                                    console.log('charaterLeftAnimated2 stop')
                                 }
                             });
                             Animated.timing(charaterTopAnimated, {
-                                toValue: tempCharaterTopAnimated + 60,
+                                toValue: tempCharaterTopAnimated,
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
-                                    console.log('left stop')
+                                    console.log('tempCharaterTopAnimated2 stop')
                                 }
                             });
                         }
@@ -275,8 +341,8 @@ const App = () => {
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(false);
-        setTempCharaterLeftAnimated(140);
-        setTempCharaterTopAnimated(270);
+        tempCharaterLeftAnimated = 140;
+        tempCharaterTopAnimated = 270;
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
@@ -341,17 +407,42 @@ const App = () => {
 
     const Rank = () => {
         const Item = ({ item, index })=> {
+            let medal = '';
+            switch (index) {
+                case 0:
+                    medal = require('./assets/image/medal_icon_01.png');
+                    break;
+                case 1:
+                    medal = require('./assets/image/medal_icon_02.png');
+                    break;
+                case 2:
+                    medal = require('./assets/image/medal_icon_03.png');
+                    break;
+            }
             return (
-                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff'}}>
-                    <Text >{item.name}</Text>
-                    <Text >{item.class}</Text>
-                    <Text >{item.score}</Text>
+                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 80}}>
+                    <View style={{flexDirection:'row'}}>
+                        {medal != '' ? (
+                            <View style={{justifyContent:'center'}}>
+                                <Image source={medal} style={{height:80,width:65}}/>
+                            </View>
+                        ) : (
+                            <View></View>
+                        )}
+                        <View style={{justifyContent:'center',marginLeft:15}}>
+                            <Text style={{fontSize: 20,fontWeight:'500'}}>{item.name}</Text>
+                            <Text style={{fontSize: 16}}>{item.class}</Text>
+                        </View>
+                    </View>
+                    <View style={{justifyContent:'center', marginRight:15}}>
+                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}>{item.score}</Text>
+                    </View>
                 </View>
             );
         }
 
         return(
-            <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={{height:'80%',width:'70%',borderRadius:15}}>
+            <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={{height:'80%',width:'90%',borderRadius:15}}>
                 <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
                     <Text style={{fontSize:30,fontWeight:'bold'}}>Top Rank</Text>
                 </View>
@@ -373,10 +464,8 @@ const App = () => {
 
     return (
         <View style={styles.background}>
-            <StatusBar hidden={true} />
-            <Start />
             <View style={styles.backgroundGame}>
-                <Animated.Image source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
+                <Animated.Image source={require('./assets/image/background_game2.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
                 <View style={{top: -540,flexDirection: 'row'}}>
                     <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
                         <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
@@ -421,8 +510,9 @@ const App = () => {
             ) : (
                 <View></View>
             )}
-                
             </View>
+            <StatusBar hidden={true} />
+            <Start />
             <Result />
             <Rank />
         </View>
