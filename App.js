@@ -4,11 +4,10 @@ import {
     Image,
     ImageBackground,
     StyleSheet,
-    ScrollView,
     View,
     Text,
     StatusBar,
-    TouchableWithoutFeedback,
+    Platform,
     TouchableOpacity,
     VirtualizedList,
     useWindowDimensions,
@@ -145,6 +144,46 @@ const data = [
         'question': 'To la ki tu nao trong bang chu cai?',
         'answer': 'と'
     },
+    {
+        'question': 'Na la ki tu nao trong bang chu cai?',
+        'answer': 'な'
+    },
+    {
+        'question': 'Ni la ki tu nao trong bang chu cai?',
+        'answer': 'に'
+    },
+    {
+        'question': 'Nu la ki tu nao trong bang chu cai?',
+        'answer': 'ぬ'
+    },
+    {
+        'question': 'Ne la ki tu nao trong bang chu cai?',
+        'answer': 'ね'
+    },
+    {
+        'question': 'No la ki tu nao trong bang chu cai?',
+        'answer': 'の'
+    },
+    {
+        'question': 'Ha la ki tu nao trong bang chu cai?',
+        'answer': 'は'
+    },
+    {
+        'question': 'Hi la ki tu nao trong bang chu cai?',
+        'answer': 'ひ'
+    },
+    {
+        'question': 'Fu la ki tu nao trong bang chu cai?',
+        'answer': 'ふ'
+    },
+    {
+        'question': 'He la ki tu nao trong bang chu cai?',
+        'answer': 'へ'
+    },
+    {
+        'question': 'Ho la ki tu nao trong bang chu cai?',
+        'answer': 'ほ'
+    },
 ];
 
 const hiragana = [
@@ -152,6 +191,8 @@ const hiragana = [
     'か', 'き', 'く', 'け', 'こ',
     'さ', 'し', 'す', 'せ', 'そ',
     'た', 'ち', 'つ', 'て', 'と',
+    'な', 'に', 'ぬ', 'ね', 'の',
+    'は', 'ひ', 'ふ', 'へ', 'ほ',
 ];
 
 LogBox.ignoreAllLogs();
@@ -160,7 +201,7 @@ var tempCharaterLeftAnimated = 100,
     tempCharaterTopAnimated = 290,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
-    movingBackground = 0
+    movingBackground = 0;
 
 const App = () => {
     //state
@@ -239,7 +280,7 @@ const App = () => {
                     duration: 0, //2000
                 }).start(( {finished} ) => {
                     if (finished) {
-                        console.log('tempCharaterLeftAnimated2 stop')
+                        console.log('charaterLeftAnimated2 stop')
                     }
                 });
                 Animated.timing(charaterTopAnimated, {
@@ -247,36 +288,41 @@ const App = () => {
                     duration: 0, //2000
                 }).start(( {finished} ) => { 
                     //di chuyen background va nhan vat theo so diem
+                    console.log('charaterTopAnimated2 stop')
                     if (finished) {
                         setvisibleQuest(true);
                         if (tempCharaterLeftAnimated > windowWidth/2) {
                             movingBackground = movingBackground + 1;
+                            console.log('movingBackground',movingBackground);
                             switch (movingBackground) {
                                 case 1:
+                                    console.log('case1');
                                     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
                                     break;
-                                case 2: 
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 80;
-                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 80;
+                                case 2:
+                                    console.log('case2');
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+                                    break;
+                                case 3:
+                                    console.log('case3');
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+                                    break;
                                 default:
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
+                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+                                    // tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 60;
                                     break;
                             }
-                            // if (movingBackground == 1) {
-                            //     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 160;
-                            //     tempCharaterTopAnimated = tempCharaterTopAnimated + 60;
-                            //     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
-                            //     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 120;
-                            // } else if ( ) {
-                            //     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
-                            //     tempCharaterTopAnimated = tempCharaterTopAnimated + 80;
-                            //     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
-                            //     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 80;
-                            // }
                             console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
                             console.log('tempBackgroundBottomAnimated',tempBackgroundBottomAnimated);
                             //di chuyen background
@@ -420,14 +466,16 @@ const App = () => {
                     break;
             }
             return (
-                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 80}}>
+                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 70}}>
                     <View style={{flexDirection:'row'}}>
                         {medal != '' ? (
                             <View style={{justifyContent:'center'}}>
-                                <Image source={medal} style={{height:80,width:65}}/>
+                                <Image source={medal} style={{height:55,width:36,marginLeft:10}}/>
                             </View>
                         ) : (
-                            <View></View>
+                            <View style={{justifyContent:'center'}}>
+                                 <Image source={require('./assets/image/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
+                            </View>
                         )}
                         <View style={{justifyContent:'center',marginLeft:15}}>
                             <Text style={{fontSize: 20,fontWeight:'500'}}>{item.name}</Text>
