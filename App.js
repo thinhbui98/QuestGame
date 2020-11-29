@@ -13,7 +13,10 @@ import {
     useWindowDimensions,
     LogBox
 } from 'react-native';
-import { Root, Overlay, ListItem, Left } from 'react-native-elements';
+import { Root, Overlay } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ENV from './config/env';
+Icon.loadFont();
 
 const rank = [
     {
@@ -196,29 +199,111 @@ const hiragana = [
 ];
 
 LogBox.ignoreAllLogs();
+//ios
+//charaterLeftAnimated: 0
+//charaterTopAnimated: 290
+//backgroundRightAnimated: 0
+//backgroundBottomAnimated: 180
+//tempCharaterLeftAnimated: 100
+//tempCharaterTopAnimated: 290
+//tempBackgroundRightAnimated: 0
+//tempBackgroundBottomAnimated: 0
+
+// switch (movingBackground) {
+//     case 1:
+//         console.log('case1');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
+//         break;
+//     case 2:
+//         console.log('case2');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+//         break;
+//     case 3:
+//         console.log('case3');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+//         break;
+//     default:
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+//         // tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 60;
+//         break;
+// }
+
+//android
+//charaterLeftAnimated: 0
+//charaterTopAnimated: 260
+//backgroundRightAnimated: 0
+//backgroundBottomAnimated: 210
+//tempCharaterLeftAnimated: 100
+//tempCharaterTopAnimated: 260
+//tempBackgroundRightAnimated: 0
+//tempBackgroundBottomAnimated: 0
+
+// switch (movingBackground) {
+//     case 1:
+//         console.log('case1');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - (Platform.OS == 'ios' ? 90 : 110);
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + (Platform.OS == 'ios' ? 20 : 30);
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + (Platform.OS == 'ios' ? 150 : 180);
+//         break;
+//     case 2:
+//         console.log('case2');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+//         break;
+//     case 3:
+//         console.log('case3');
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
+//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+//         break;
+//     default:
+//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
+//         tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
+//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+//         break;
+// }
 
 var tempCharaterLeftAnimated = 100,
-    tempCharaterTopAnimated = 290,
+    tempCharaterTopAnimated = Platform.OS == 'ios' ? 290 : 260,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
-    movingBackground = 0;
+    movingBackground = 0,
+    renderAnwser = [],
+    flagAnwser = true,
+    questNum = 0
 
 const App = () => {
     //state
-    const [questNum, setQuestNum] = useState(0);
+    // const [questNum, setQuestNum] = useState(0);
     const [score, setScore] = useState(0);
     const [visibleStartGame, setVisibleStartGame] = useState(true);
     const [visibleResult, setVisibleResult] = useState(false);
     const [visibleRank, setVisibleRank] = useState(false);
     const [visibleQuest, setvisibleQuest] = useState(false);
     const [characterStatus, setcharacterStatus] = useState(false);
+    const [timeCount, setTimeCount] = useState(20);
 
     //animated
-    //trang thai dau tien tren ios
+    //trang thai dau tien
     const charaterLeftAnimated = useRef(new Animated.Value(0)).current;
-    const charaterTopAnimated = useRef(new Animated.Value(290)).current;
+    const charaterTopAnimated = useRef(new Animated.Value(ENV.DEFAULT_CHARATER_TOP_ANIMATED)).current;
     const backgroundRightAnimated = useRef(new Animated.Value(0)).current;
-    const backgroundBottomAnimated = useRef(new Animated.Value(180)).current;
+    const backgroundBottomAnimated = useRef(new Animated.Value(ENV.DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current;
 
     //demension
     const windowWidth = useWindowDimensions().width;
@@ -227,48 +312,61 @@ const App = () => {
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
 
-    let i = 0, temp;
-    while (i < 3) {
-        let rand = Math.floor(Math.random() * hiragana.length);
-        if(answer.indexOf(hiragana[rand]) == -1){
-            if(hiragana[rand] != answer[0] && rand != temp){
-                answer.push(hiragana[rand]);
-                answer.sort(() => Math.random() - 0.5);
-                temp = rand;
-                i++;
+    if (flagAnwser) {
+        let i = 0, temp;
+        while (i < 3) {
+            let rand = Math.floor(Math.random() * hiragana.length);
+            if(answer.indexOf(hiragana[rand]) == -1){
+                if(hiragana[rand] != answer[0] && rand != temp){
+                    answer.push(hiragana[rand]);
+                    answer.sort(() => Math.random() - 0.5);
+                    temp = rand;
+                    i++;
+                }
             }
         }
+        renderAnwser = answer;
+        flagAnwser = false;
+    }
+    
+
+    const timeQuest = () => {
+        let countDownDate = new Date();
+        countDownDate.setSeconds(countDownDate.getSeconds() + 21);
+
+        // Dem gio theo tung giay
+        let countSecond = setInterval(() => {
+            let now = new Date();
+            // Tinh khoang cach voi gio hien tai
+            let distance = countDownDate - now;
+            
+            // Time calculations for days, hours, minutes and seconds
+            let seconds = Math.floor((distance % (1000 * 200)) / 1000);
+
+            setTimeCount(seconds)
+            if (seconds == 0) {
+                clearInterval(countSecond);
+                console.log('TIME OUT');
+            }
+            // Output the result 
+            console.log(seconds,seconds + "s");
+        }, 1000);
     }
 
-    const chooseAnswer = answer => {
+    const chooseAnswer = (answer,index) => {
         if (answer == data[questNum].answer) {
             setScore(score + 1);
             setcharacterStatus(true);
-            setvisibleQuest(false);
             if (score < 1) {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
                     toValue: windowWidth/4,
-                    duration: 0, //3000
+                    duration: 3000,
                 }).start(( {finished} ) => {
                     if (finished) {
-                        Animated.timing(charaterLeftAnimated, {
-                            toValue: tempCharaterLeftAnimated,
-                            duration: 0, //2000
-                        }).start(( {finished} ) => {
-                            if (finished) {
-                                console.log('charaterLeftAnimated stop')
-                            }
-                        });
-                        Animated.timing(charaterTopAnimated, {
-                            toValue: tempCharaterTopAnimated,
-                            duration: 0, //2000
-                        }).start(( {finished} ) => { 
-                            if (finished) {
-                                console.log('charaterTopAnimated stop')
-                                setvisibleQuest(true);
-                            }
-                        });
+                        questNum++;
+                        console.log('questNum2',questNum);
+                        flagAnwser = true;
                     }
                 });
             } else {
@@ -277,7 +375,7 @@ const App = () => {
                 tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
-                    duration: 0, //2000
+                    duration: 2000, 
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('charaterLeftAnimated2 stop')
@@ -285,22 +383,21 @@ const App = () => {
                 });
                 Animated.timing(charaterTopAnimated, {
                     toValue: tempCharaterTopAnimated,
-                    duration: 0, //2000
+                    duration: 2000, 
                 }).start(( {finished} ) => { 
                     //di chuyen background va nhan vat theo so diem
                     console.log('charaterTopAnimated2 stop')
                     if (finished) {
-                        setvisibleQuest(true);
                         if (tempCharaterLeftAnimated > windowWidth/2) {
                             movingBackground = movingBackground + 1;
                             console.log('movingBackground',movingBackground);
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - (Platform.OS == 'ios' ? 90 : 110);
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + (Platform.OS == 'ios' ? 20 : 30);
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + (Platform.OS == 'ios' ? 150 : 180);
                                     break;
                                 case 2:
                                     console.log('case2');
@@ -320,7 +417,6 @@ const App = () => {
                                     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
-                                    // tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 60;
                                     break;
                             }
                             console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
@@ -330,6 +426,7 @@ const App = () => {
                                 toValue: tempBackgroundRightAnimated,
                                 duration: 1000,
                             }).start(( {finished} ) => {
+
                                 if (finished) {
                                     console.log('backgroundRightAnimated1 stop')
                                 }
@@ -357,9 +454,14 @@ const App = () => {
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
+                                    questNum++;
+                                    flagAnwser = true;
                                     console.log('tempCharaterTopAnimated2 stop')
                                 }
                             });
+                        } else {
+                            questNum++;
+                            flagAnwser = true;
                         }
                     }
                 });
@@ -371,19 +473,22 @@ const App = () => {
         if (questNum == data.length - 1) {
             setVisibleResult(!visibleResult);
         } else {
-            setQuestNum(questNum + 1);
+            // questNum++;
+            // flagAnwser = true;
         }
     }
 
     const playAgain = () => {
-        setQuestNum(0);
+        // setQuestNum(0);
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(!visibleResult);
     }
 
     const quitGame = () => {
-        setQuestNum(0);
+        // setQuestNum(0);
+        questNum = 0;
+        console.log('questNum3',questNum);
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(false);
@@ -395,7 +500,7 @@ const App = () => {
         }).start();
 
         Animated.timing(charaterTopAnimated, {
-            toValue: 290,
+            toValue: ENV.DEFAULT_CHARATER_TOP_ANIMATED,
             duration: 0,
         }).start();
 
@@ -405,7 +510,7 @@ const App = () => {
         }).start();
 
         Animated.timing(backgroundBottomAnimated, {
-            toValue: 180,
+            toValue: ENV.DEFAULT_BACKGROUND_BOTTOM_ANIMATED,
             duration: 0,
         }).start();
     }
@@ -417,6 +522,8 @@ const App = () => {
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
+        // timeQuest()
+
     }
 
     const Start = () => {
@@ -470,7 +577,7 @@ const App = () => {
                     <View style={{flexDirection:'row'}}>
                         {medal != '' ? (
                             <View style={{justifyContent:'center'}}>
-                                <Image source={medal} style={{height:55,width:36,marginLeft:10}}/>
+                                <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
                             </View>
                         ) : (
                             <View style={{justifyContent:'center'}}>
@@ -514,50 +621,46 @@ const App = () => {
         <View style={styles.background}>
             <View style={styles.backgroundGame}>
                 <Animated.Image source={require('./assets/image/background_game2.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
-                <View style={{top: -540,flexDirection: 'row'}}>
+                <View style={{top: Platform.OS == 'ios' ? -540 : -540,flexDirection: 'row'}}>
                     <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
                         <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
-                        <Text style={{fontSize: 20}}>120</Text>
+                        <Text style={{fontSize: 20}}>{timeCount}</Text>
                     </View>
                     <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
                         <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
                         <Text style={{fontSize: 20}}>{score}</Text>
                     </View>
                 </View>
-                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_stay.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
             </View>
             <View style={styles.backgroundQuest}>
-            {visibleQuest ? (
-                <View>
-                    <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
-                        <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
-                    </ImageBackground>
-                    <View style={styles.answer}>
-                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[0])}>
-                            <Text style={styles.answerText}>{answer[0]}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[1])}>
-                            <Text style={styles.answerText}>{answer[1]}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[2])}>
-                            <Text style={styles.answerText}>{answer[2]}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(answer[3])}>
-                            <Text style={styles.answerText}>{answer[3]}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.footerButton}>
-                        <TouchableOpacity style={styles.quitButton} onPress={quitGame}>
-                            <Text style={styles.titleQuitButton}>Quit</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
-                            <Text  style={styles.titleRankButton}>Rank</Text>
-                        </TouchableOpacity>
-                    </View>
+                <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
+                    <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
+                </ImageBackground>
+                <View style={styles.answer}>
+                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[0])}>
+                        <Text style={styles.answerText}>{renderAnwser[0]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[1])}>
+                        <Text style={styles.answerText}>{renderAnwser[1]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[2])}>
+                        <Text style={styles.answerText}>{renderAnwser[2]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[3])}>
+                        <Text style={styles.answerText}>{renderAnwser[3]}</Text>
+                    </TouchableOpacity>
                 </View>
-            ) : (
-                <View></View>
-            )}
+                <View style={styles.footerButton}>
+                    <TouchableOpacity style={styles.quitButton} onPress={quitGame}>
+                        <Icon name="arrow-circle-left" size={30} color="#ffffff" />
+                        <Text style={styles.titleQuitButton}>Quit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
+                        <Icon name="trophy" size={30} color="#ff0000" /> 
+                        <Text  style={styles.titleRankButton}>Charts</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
             <StatusBar hidden={true} />
             <Start />
@@ -623,7 +726,8 @@ const styles = StyleSheet.create({
         bottom : 20
     },
     quitButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#ff0000',
+        flexDirection: 'row',
         width: '45%',
         borderRadius: 10,
         justifyContent: 'center',
@@ -631,6 +735,7 @@ const styles = StyleSheet.create({
     },
     rankButton: {
         backgroundColor: 'white',
+        flexDirection: 'row',
         width: '45%',
         borderRadius: 10,
         justifyContent: 'center',
@@ -673,17 +778,19 @@ const styles = StyleSheet.create({
     },
     scoreResult: {
         fontSize: 120, 
-        color: 'red'
+        color: '#ff0000'
     },
     titleQuitButton: {
         color: '#ffffff',
         fontSize: 22,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginLeft: 10
     },
     titleRankButton: {
-        color: '#000000',
+        color: '#ff0000',
         fontSize: 22,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginLeft: 10
     }
 });
 
