@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Root, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CountDown from 'react-native-countdown-component';
 import ENV from './config/env';
 Icon.loadFont();
 
@@ -296,7 +297,10 @@ const App = () => {
     const [visibleRank, setVisibleRank] = useState(false);
     const [visibleQuest, setvisibleQuest] = useState(false);
     const [characterStatus, setcharacterStatus] = useState(false);
-    const [timeCount, setTimeCount] = useState(20);
+    const [flagAnswer, setFlagAnswer] = useState(true);
+    const [clock, setClock] = useState(false);
+    const [timeClock, setTimeClock] = useState(30);
+    const [disableAnswer, setDisableAnswer] = useState(false);
 
     //animated
     //trang thai dau tien
@@ -311,8 +315,9 @@ const App = () => {
 
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
-
-    if (flagAnwser) {
+    console.log('questNum',questNum);
+    console.log('flagAnwser',flagAnwser);
+    if (flagAnswer) {
         let i = 0, temp;
         while (i < 3) {
             let rand = Math.floor(Math.random() * hiragana.length);
@@ -326,35 +331,14 @@ const App = () => {
             }
         }
         renderAnwser = answer;
-        flagAnwser = false;
-    }
-    
-
-    const timeQuest = () => {
-        let countDownDate = new Date();
-        countDownDate.setSeconds(countDownDate.getSeconds() + 21);
-
-        // Dem gio theo tung giay
-        let countSecond = setInterval(() => {
-            let now = new Date();
-            // Tinh khoang cach voi gio hien tai
-            let distance = countDownDate - now;
-            
-            // Time calculations for days, hours, minutes and seconds
-            let seconds = Math.floor((distance % (1000 * 200)) / 1000);
-
-            setTimeCount(seconds)
-            if (seconds == 0) {
-                clearInterval(countSecond);
-                console.log('TIME OUT');
-            }
-            // Output the result 
-            console.log(seconds,seconds + "s");
-        }, 1000);
+        setFlagAnswer(false);
     }
 
     const chooseAnswer = (answer,index) => {
+        setDisableAnswer(true);
         if (answer == data[questNum].answer) {
+            setClock(false);
+            setTimeClock(30);
             setScore(score + 1);
             setcharacterStatus(true);
             if (score < 1) {
@@ -365,8 +349,10 @@ const App = () => {
                 }).start(( {finished} ) => {
                     if (finished) {
                         questNum++;
-                        console.log('questNum2',questNum);
-                        flagAnwser = true;
+                        setFlagAnswer(true);
+                        setClock(true);
+                        setDisableAnswer(false);
+                        console.log('questNum1',questNum);
                     }
                 });
             } else {
@@ -455,19 +441,20 @@ const App = () => {
                             }).start(( {finished} ) => {
                                 if (finished) {
                                     questNum++;
-                                    flagAnwser = true;
+                                    setFlagAnswer(true);
                                     console.log('tempCharaterTopAnimated2 stop')
                                 }
                             });
                         } else {
                             questNum++;
-                            flagAnwser = true;
+                            setFlagAnswer(true);
                         }
                     }
                 });
             }
         } else {
             setVisibleResult(!visibleResult);
+            setClock(false);
         }
 
         if (questNum == data.length - 1) {
@@ -522,8 +509,7 @@ const App = () => {
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
-        // timeQuest()
-
+        setClock(true);
     }
 
     const Start = () => {
@@ -534,6 +520,26 @@ const App = () => {
                 </TouchableOpacity>
             </Overlay>
         );
+    }
+
+    const CountTime = () => {
+        const onFinishTime = () => {
+            setClock(false);
+            setTimeClock(0);
+            setVisibleResult(!visibleResult);
+        }
+        return(
+            <CountDown
+                until={timeClock}
+                size={25}
+                onFinish={onFinishTime}
+                timeToShow={['S']}
+                timeLabels={{s: ''}}
+                digitStyle={{backgroundColor: 'none',left: -10}}
+                running={clock}
+                digitTxtStyle={{color: '#cc5c00'}}
+            />
+        )
     }
 
     const Result = () => {
@@ -621,14 +627,18 @@ const App = () => {
         <View style={styles.background}>
             <View style={styles.backgroundGame}>
                 <Animated.Image source={require('./assets/image/background_game2.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
-                <View style={{top: Platform.OS == 'ios' ? -540 : -540,flexDirection: 'row'}}>
-                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text>
-                        <Text style={{fontSize: 20}}>{timeCount}</Text>
+                <View style={{top: Platform.OS == 'ios' ? -540 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
+                    <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
+                        {/* <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text> */}
+                        {/* <Icon name='hourglass' size={20} style={{marginLeft:15}} /> */}
+                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35, marginLeft: 20}} />
+                        <CountTime />
+                        {/* <Text style={{fontSize: 20}}>{timeCount}</Text> */}
                     </View>
-                    <View style={{width:60,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center'}}>
-                        <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text>
-                        <Text style={{fontSize: 20}}>{score}</Text>
+                    <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginRight:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
+                        {/* <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text> */}
+                        <Image source={require('./assets/image/star.gif')} style={{height:40,width:40}} />
+                        <Text style={{fontSize: 25, fontWeight:'bold',color:'#ffcc00'}}>{score < 10 ? '0'+score : score }</Text>
                     </View>
                 </View>
                 <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
@@ -638,16 +648,16 @@ const App = () => {
                     <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
                 </ImageBackground>
                 <View style={styles.answer}>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[0])}>
+                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0])}>
                         <Text style={styles.answerText}>{renderAnwser[0]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[1])}>
+                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[1])}>
                         <Text style={styles.answerText}>{renderAnwser[1]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[2])}>
+                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[2])}>
                         <Text style={styles.answerText}>{renderAnwser[2]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} onPress={() => chooseAnswer(renderAnwser[3])}>
+                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[3])}>
                         <Text style={styles.answerText}>{renderAnwser[3]}</Text>
                     </TouchableOpacity>
                 </View>
