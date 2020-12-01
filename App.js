@@ -299,7 +299,7 @@ const App = () => {
     const [characterStatus, setcharacterStatus] = useState(false);
     const [flagAnswer, setFlagAnswer] = useState(true);
     const [clock, setClock] = useState(false);
-    const [timeClock, setTimeClock] = useState(30);
+    const [timeClock, setTimeClock] = useState(30 * 15);
     const [disableAnswer, setDisableAnswer] = useState(false);
 
     //animated
@@ -338,7 +338,6 @@ const App = () => {
         setDisableAnswer(true);
         if (answer == data[questNum].answer) {
             setClock(false);
-            setTimeClock(30);
             setScore(score + 1);
             setcharacterStatus(true);
             if (score < 1) {
@@ -441,13 +440,17 @@ const App = () => {
                             }).start(( {finished} ) => {
                                 if (finished) {
                                     questNum++;
+                                    setClock(true);
                                     setFlagAnswer(true);
+                                    setDisableAnswer(false);
                                     console.log('tempCharaterTopAnimated2 stop')
                                 }
                             });
                         } else {
                             questNum++;
+                            setClock(true);
                             setFlagAnswer(true);
+                            setDisableAnswer(false);
                         }
                     }
                 });
@@ -522,24 +525,9 @@ const App = () => {
         );
     }
 
-    const CountTime = () => {
-        const onFinishTime = () => {
-            setClock(false);
-            setTimeClock(0);
-            setVisibleResult(!visibleResult);
-        }
-        return(
-            <CountDown
-                until={timeClock}
-                size={25}
-                onFinish={onFinishTime}
-                timeToShow={['S']}
-                timeLabels={{s: ''}}
-                digitStyle={{backgroundColor: 'none',left: -10}}
-                running={clock}
-                digitTxtStyle={{color: '#cc5c00'}}
-            />
-        )
+    const onFinishTime = () => {
+        setClock(false);
+        setVisibleResult(!visibleResult);
     }
 
     const Result = () => {
@@ -628,11 +616,22 @@ const App = () => {
             <View style={styles.backgroundGame}>
                 <Animated.Image source={require('./assets/image/background_game2.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
                 <View style={{top: Platform.OS == 'ios' ? -540 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
-                    <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
+                    <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
                         {/* <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text> */}
                         {/* <Icon name='hourglass' size={20} style={{marginLeft:15}} /> */}
-                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35, marginLeft: 20}} />
-                        <CountTime />
+                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
+                        <CountDown
+                            until={timeClock}
+                            size={25}
+                            onFinish={onFinishTime}
+                            timeToShow={['M','S']}
+                            timeLabels={{m: null, s: null}}
+                            digitStyle={{backgroundColor: 'none', marginLeft:-10}}
+                            running={clock}
+                            digitTxtStyle={{color: '#cc5c00'}}
+                            separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
+                            showSeparator
+                        />
                         {/* <Text style={{fontSize: 20}}>{timeCount}</Text> */}
                     </View>
                     <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginRight:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
