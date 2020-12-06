@@ -10,60 +10,59 @@ import {
     Platform,
     TouchableOpacity,
     VirtualizedList,
-    useWindowDimensions,
+    Dimensions,
     LogBox
 } from 'react-native';
 import { Root, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CountDown from 'react-native-countdown-component';
-import ENV from './config/env';
 Icon.loadFont();
 
 const rank = [
     {
         name:'Nguyen Van A',
         class: 'A123',
-        score: 28
+        score: 30
     },
     {
         name:'Nguyen Van B',
         class: 'B199',
-        score: 20
+        score: 28
     },
     {
         name:'Nguyen Van C',
         class: 'A123',
-        score: 10
+        score: 27
     },
     {
         name:'Nguyen Van D',
         class: 'B123',
-        score: 30
+        score: 23
     },
     {
         name:'Nguyen Van A',
         class: 'A123',
-        score: 28
+        score: 21
     },
     {
         name:'Nguyen Van B',
         class: 'B199',
-        score: 20
+        score: 17
     },
     {
         name:'Nguyen Van A',
         class: 'A123',
-        score: 28
+        score: 17
     },
     {
         name:'Nguyen Van B',
         class: 'B199',
-        score: 20
+        score: 16
     },
     {
         name:'Nguyen Van A',
         class: 'A123',
-        score: 28
+        score: 10
     }
 ];
 
@@ -279,18 +278,30 @@ LogBox.ignoreAllLogs();
 //         break;
 // }
 
+
+const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
+    URL_GETRANKGAME = 'http://haki.work/api/getRankGame',
+    windowWidth = Dimensions.get('window').width,
+    windowHeight = Dimensions.get('window').height,
+    DEFAULT_CHARATER_TOP_ANIMATED = 280,
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 190
+
+    console.log('windowWidth',windowWidth);
+    console.log('windowHeight',windowHeight);
+    console.log('width quest',windowWidth * 0.85);
+    console.log('height quest',windowHeight - (windowWidth * 0.85));
 var tempCharaterLeftAnimated = 100,
-    tempCharaterTopAnimated = Platform.OS == 'ios' ? 290 : 260,
+    tempCharaterTopAnimated = 280,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
     movingBackground = 0,
     renderAnwser = [],
-    flagAnwser = true,
-    questNum = 0
+    questNum = 0,
+    timeLeft = 0,
+    flagFirework = false
 
 const App = () => {
     //state
-    // const [questNum, setQuestNum] = useState(0);
     const [score, setScore] = useState(0);
     const [visibleStartGame, setVisibleStartGame] = useState(true);
     const [visibleResult, setVisibleResult] = useState(false);
@@ -299,24 +310,20 @@ const App = () => {
     const [characterStatus, setcharacterStatus] = useState(false);
     const [flagAnswer, setFlagAnswer] = useState(true);
     const [clock, setClock] = useState(false);
-    const [timeClock, setTimeClock] = useState(30 * 15);
+    const [timeClock, setTimeClock] = useState(30 * 10);
     const [disableAnswer, setDisableAnswer] = useState(false);
+    const [chooseMaleCharacter, setChooseMaleCharacter] = useState(true);
+    const [chooseFemaleCharacter, setChooseFemaleCharacter] = useState(true);
 
     //animated
     //trang thai dau tien
     const charaterLeftAnimated = useRef(new Animated.Value(0)).current;
-    const charaterTopAnimated = useRef(new Animated.Value(ENV.DEFAULT_CHARATER_TOP_ANIMATED)).current;
+    const charaterTopAnimated = useRef(new Animated.Value(DEFAULT_CHARATER_TOP_ANIMATED)).current;
     const backgroundRightAnimated = useRef(new Animated.Value(0)).current;
-    const backgroundBottomAnimated = useRef(new Animated.Value(ENV.DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current;
-
-    //demension
-    const windowWidth = useWindowDimensions().width;
-    const windowHeight = useWindowDimensions().height;
+    const backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current;
 
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
-    console.log('questNum',questNum);
-    console.log('flagAnwser',flagAnwser);
     if (flagAnswer) {
         let i = 0, temp;
         while (i < 3) {
@@ -332,6 +339,24 @@ const App = () => {
         }
         renderAnwser = answer;
         setFlagAnswer(false);
+    }
+
+    const callApi = (url,params) => {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     }
 
     const chooseAnswer = (answer,index) => {
@@ -351,7 +376,6 @@ const App = () => {
                         setFlagAnswer(true);
                         setClock(true);
                         setDisableAnswer(false);
-                        console.log('questNum1',questNum);
                     }
                 });
             } else {
@@ -379,10 +403,10 @@ const App = () => {
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - (Platform.OS == 'ios' ? 90 : 110);
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + (Platform.OS == 'ios' ? 20 : 30);
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + (Platform.OS == 'ios' ? 150 : 180);
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
                                     break;
                                 case 2:
                                     console.log('case2');
@@ -399,9 +423,12 @@ const App = () => {
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                     break;
                                 default:
+                                    console.log('case last');
                                     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
-                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+                                    if (questNum < data.length - 1) {
+                                        tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+                                    }
                                     break;
                             }
                             console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
@@ -439,46 +466,52 @@ const App = () => {
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
-                                    questNum++;
-                                    setClock(true);
-                                    setFlagAnswer(true);
-                                    setDisableAnswer(false);
-                                    console.log('tempCharaterTopAnimated2 stop')
+                                    if (questNum == data.length - 1) {
+                                        flagFirework = true;
+                                        setVisibleResult(!visibleResult);
+                                        setClock(false);
+                                    } else {
+                                        questNum++;
+                                        setClock(true);
+                                        setFlagAnswer(true);
+                                        setDisableAnswer(false);
+                                        console.log('tempCharaterTopAnimated2 stop')
+                                    }
                                 }
                             });
                         } else {
-                            questNum++;
-                            setClock(true);
-                            setFlagAnswer(true);
-                            setDisableAnswer(false);
+                            if (questNum == data.length - 1) {
+                                flagFirework = true;
+                                setVisibleResult(!visibleResult);
+                                setClock(false);
+                            } else {
+                                questNum++;
+                                setClock(true);
+                                setFlagAnswer(true);
+                                setDisableAnswer(false);
+                            }
                         }
                     }
                 });
             }
         } else {
+            questNum = 0;
             setVisibleResult(!visibleResult);
             setClock(false);
-        }
-
-        if (questNum == data.length - 1) {
-            setVisibleResult(!visibleResult);
-        } else {
-            // questNum++;
-            // flagAnwser = true;
         }
     }
 
     const playAgain = () => {
-        // setQuestNum(0);
+        questNum = 0;
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(!visibleResult);
     }
 
     const quitGame = () => {
-        // setQuestNum(0);
         questNum = 0;
-        console.log('questNum3',questNum);
+        setClock(false);
+        setTimeClock(timeClock);
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(false);
@@ -490,7 +523,7 @@ const App = () => {
         }).start();
 
         Animated.timing(charaterTopAnimated, {
-            toValue: ENV.DEFAULT_CHARATER_TOP_ANIMATED,
+            toValue: DEFAULT_CHARATER_TOP_ANIMATED,
             duration: 0,
         }).start();
 
@@ -500,29 +533,21 @@ const App = () => {
         }).start();
 
         Animated.timing(backgroundBottomAnimated, {
-            toValue: ENV.DEFAULT_BACKGROUND_BOTTOM_ANIMATED,
+            toValue: DEFAULT_BACKGROUND_BOTTOM_ANIMATED,
             duration: 0,
         }).start();
     }
 
     const modalRank = () => {
         setVisibleRank(!visibleRank);
+        setClock(!clock);
     };
 
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
         setClock(true);
-    }
-
-    const Start = () => {
-        return(
-            <Overlay isVisible={visibleStartGame} overlayStyle={styles.modalStartButton}>
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.textStartButton}>Start Game</Text>
-                </TouchableOpacity>
-            </Overlay>
-        );
+        timeLeft = timeClock;
     }
 
     const onFinishTime = () => {
@@ -530,7 +555,52 @@ const App = () => {
         setVisibleResult(!visibleResult);
     }
 
+    const onChangeTime = () => {
+        timeLeft = timeLeft - 1;
+        console.log(timeLeft);
+    }
+
+    const changeMaleCharater = () => {
+        setChooseMaleCharacter(true);
+        setChooseFemaleCharacter(false);
+    }
+
+    const changeFemaleCharater = () => {
+        setChooseFemaleCharacter(true);
+        setChooseMaleCharacter(false);
+    }
+
+    const Start = () => {
+        let female, male = {};
+        if (chooseMaleCharacter) {
+            male = {borderRadius:10, borderColor: 'black',borderWidth: 3};
+            female = {};
+        } else {
+            female = {borderRadius:10, borderColor: 'black',borderWidth: 3};
+            male = {};
+        }
+        return(
+            <Overlay isVisible={visibleStartGame} overlayStyle={styles.modalStartButton}>
+                <View style={styles.headerStartButton}>
+                    <Text style={styles.textHeaderStartButton}>Choose Character</Text>
+                </View>
+                <View style={{flexDirection: 'row', justifyContent: 'space-around', height: '50%'}}>
+                    <TouchableOpacity onPress={changeMaleCharater} style={[male,{height: 160, width:90}]}>
+                        <Image source={require('./assets/image/character_male_choose.png')} style={{height: 160, width:90}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={changeFemaleCharater} style={[female,{height: 160, width:90}]}>
+                        <Image source={require('./assets/image/character_female_choose.png')} style={{height: 160, width:90}}/>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={styles.startButton} onPress={startGame}>
+                    <Text style={styles.textStartButton}>Start Game</Text>
+                </TouchableOpacity>
+            </Overlay>
+        );
+    }
+
     const Result = () => {
+        // callApi(URL_SETSCORE)
         return(
             <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={styles.modalResult}>
                 <View style={styles.headerResult}>
@@ -553,6 +623,11 @@ const App = () => {
     }
 
     const Rank = () => {
+        let params = {
+            access_token:"ef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca1",
+            lesson_id:"1"
+        }
+        // callApi(URL_GETRANKGAME,params);
         const Item = ({ item, index })=> {
             let medal = '';
             switch (index) {
@@ -613,17 +688,16 @@ const App = () => {
 
     return (
         <View style={styles.background}>
-            <View style={styles.backgroundGame}>
-                <Animated.Image source={require('./assets/image/background_game2.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,position:'relative',right:backgroundRightAnimated}} />
-                <View style={{top: Platform.OS == 'ios' ? -540 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
-                    <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
-                        {/* <Text style={{fontSize: 18,fontWeight:'bold'}}>Time</Text> */}
-                        {/* <Icon name='hourglass' size={20} style={{marginLeft:15}} /> */}
-                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
+            <View style={{ height: windowWidth}}>
+                <Animated.Image source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,right:backgroundRightAnimated,position:'relative'}} />
+                <View style={{top: Platform.OS == 'ios' ? -520 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
+                    <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'#ffffff',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
+                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
                         <CountDown
                             until={timeClock}
                             size={25}
                             onFinish={onFinishTime}
+                            onChange={onChangeTime}
                             timeToShow={['M','S']}
                             timeLabels={{m: null, s: null}}
                             digitStyle={{backgroundColor: 'none', marginLeft:-10}}
@@ -632,31 +706,38 @@ const App = () => {
                             separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
                             showSeparator
                         />
-                        {/* <Text style={{fontSize: 20}}>{timeCount}</Text> */}
                     </View>
                     <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginRight:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
-                        {/* <Text style={{fontSize: 18,fontWeight:'bold'}}>Score</Text> */}
                         <Image source={require('./assets/image/star.gif')} style={{height:40,width:40}} />
                         <Text style={{fontSize: 25, fontWeight:'bold',color:'#ffcc00'}}>{score < 10 ? '0'+score : score }</Text>
                     </View>
                 </View>
-                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                {chooseMaleCharacter ? (
+                    <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                ) : (
+                    <Animated.Image source={characterStatus ? require('./assets/image/character_female_moving.gif') : require('./assets/image/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                )}
+                {flagFirework ? (
+                    <Animated.Image source={require('./assets/image/firework.gif')} style={{height: 100, width: 100, top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated, position:'absolute'}} />
+                ) : (
+                    <View></View>
+                )}
             </View>
-            <View style={styles.backgroundQuest}>
-                <ImageBackground source={require('./assets/image/hexagon.png')} style={styles.quest}>
+            <View style={[styles.backgroundQuest, {height: windowHeight - (windowWidth * 0.9)}]}>
+                <ImageBackground source={require('./assets/image/hexagon.png')} style={[styles.quest,{height: '16%'}]}>
                     <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
                 </ImageBackground>
                 <View style={styles.answer}>
-                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0])}>
+                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0])}>
                         <Text style={styles.answerText}>{renderAnwser[0]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[1])}>
+                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[1])}>
                         <Text style={styles.answerText}>{renderAnwser[1]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[2])}>
+                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[2])}>
                         <Text style={styles.answerText}>{renderAnwser[2]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.answerButton} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[3])}>
+                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[3])}>
                         <Text style={styles.answerText}>{renderAnwser[3]}</Text>
                     </TouchableOpacity>
                 </View>
@@ -684,42 +765,29 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-    },
-    backgroundGame: {
-        height: '40%',
-        backgroundColor: 'black'
-    },
-    imageGame: {
-        height: 1920,
-        width: 1080,
-        bottom: 1500,
-        // left:300,
-        flexDirection: 'row'
+        backgroundColor: '#00ffbf'
     },
     backgroundQuest: {
-        height: '60%',
-        backgroundColor: '#00ffbf',
         justifyContent: 'center'
     },
     quest: {
+        marginTop: Platform.OS == 'ios' ? -40 : -60,
         justifyContent: 'center',
         alignItems: 'center',
-        height: 90,
-        width: '100%',
-        marginTop: 10
+        width: '100%'
     },
     answer: {
-        marginTop: -15,
+        marginTop: -10,
         justifyContent: 'center',
         alignItems: 'center',
     },
     answerButton: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: '15%',
+        height: '16%',
         width: '80%',
         backgroundColor: '#66ccff',
-        marginBottom: 13,
+        marginBottom: '3%',
         borderRadius: 10
     },
     answerText:{
@@ -732,12 +800,13 @@ const styles = StyleSheet.create({
         height: '10%',
         marginLeft: 10,
         marginRight: 10,
-        bottom : 20
+        bottom: 15,
     },
     quitButton: {
         backgroundColor: '#ff0000',
         flexDirection: 'row',
         width: '45%',
+        minHeight: 35,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
@@ -746,6 +815,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         flexDirection: 'row',
         width: '45%',
+        minHeight: 35,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
@@ -754,13 +824,25 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff0000',
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 20,
+        borderRadius: 10,
+        height: '20%'
     },
     modalStartButton: {
-        backgroundColor: '#ff0000',
-        height: '7%',
+        height: '45%',
         width: '70%',
         borderRadius: 15,
-        justifyContent: 'center'
+        justifyContent: 'flex-start'
+    },
+    headerStartButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '20%'
+    },
+    textHeaderStartButton: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#ff0000'
     },
     textStartButton: {
         color: 'white',
