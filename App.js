@@ -284,7 +284,12 @@ const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
     windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,
     DEFAULT_CHARATER_TOP_ANIMATED = 280,
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 190
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 190,
+    TIME_DEFAULT = 10,
+    PARAMS = {
+        access_token:"ef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca1",
+        lesson_id:"1"
+    }
 
     console.log('windowWidth',windowWidth);
     console.log('windowHeight',windowHeight);
@@ -298,7 +303,8 @@ var tempCharaterLeftAnimated = 100,
     renderAnwser = [],
     questNum = 0,
     timeLeft = 0,
-    flagFirework = false
+    flagFirework = false,
+    timeAnswer = TIME_DEFAULT * data.length
 
 const App = () => {
     //state
@@ -309,8 +315,9 @@ const App = () => {
     const [visibleQuest, setvisibleQuest] = useState(false);
     const [characterStatus, setcharacterStatus] = useState(false);
     const [flagAnswer, setFlagAnswer] = useState(true);
+    const [flagQuest, setFlagQuest] = useState(true);
     const [clock, setClock] = useState(false);
-    const [timeClock, setTimeClock] = useState(30 * 10);
+    const [timeClock, setTimeClock] = useState(timeAnswer);
     const [disableAnswer, setDisableAnswer] = useState(false);
     const [chooseMaleCharacter, setChooseMaleCharacter] = useState(true);
     const [chooseFemaleCharacter, setChooseFemaleCharacter] = useState(true);
@@ -324,6 +331,11 @@ const App = () => {
 
     const questions = data[questNum].question;
     const answer = [data[questNum].answer];
+    if (flagQuest) {
+        data.sort(() => Math.random() - 0.5);
+        setFlagQuest(false);
+        console.log('random quest 111111111111111111');
+    }
     if (flagAnswer) {
         let i = 0, temp;
         while (i < 3) {
@@ -496,6 +508,7 @@ const App = () => {
             }
         } else {
             questNum = 0;
+            setTimeClock(timeAnswer);
             setVisibleResult(!visibleResult);
             setClock(false);
         }
@@ -504,11 +517,13 @@ const App = () => {
     const playAgain = () => {
         questNum = 0;
         setScore(0);
+        setClock(true);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(!visibleResult);
     }
 
     const quitGame = () => {
+        alert('quitGame')
         questNum = 0;
         setClock(false);
         setTimeClock(timeClock);
@@ -538,6 +553,10 @@ const App = () => {
         }).start();
     }
 
+    const backGame = () => {
+        alert('back Game')
+    }
+
     const modalRank = () => {
         setVisibleRank(!visibleRank);
         setClock(!clock);
@@ -560,40 +579,61 @@ const App = () => {
         console.log(timeLeft);
     }
 
-    const changeMaleCharater = () => {
-        setChooseMaleCharacter(true);
-        setChooseFemaleCharacter(false);
-    }
-
-    const changeFemaleCharater = () => {
-        setChooseFemaleCharacter(true);
-        setChooseMaleCharacter(false);
-    }
-
     const Start = () => {
-        let female, male = {};
-        if (chooseMaleCharacter) {
-            male = {borderRadius:10, borderColor: 'black',borderWidth: 3};
-            female = {};
-        } else {
-            female = {borderRadius:10, borderColor: 'black',borderWidth: 3};
-            male = {};
+        // callApi(URL_GETRANKGAME,params);
+        const Item = ({ item, index })=> {
+            let medal = '';
+            switch (index) {
+                case 0:
+                    medal = require('./assets/image/medal_icon_01.png');
+                    break;
+                case 1:
+                    medal = require('./assets/image/medal_icon_02.png');
+                    break;
+                case 2:
+                    medal = require('./assets/image/medal_icon_03.png');
+                    break;
+            }
+            return (
+                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 60}}>
+                    <View style={{flexDirection:'row'}}>
+                        {medal != '' ? (
+                            <View style={{justifyContent:'center'}}>
+                                <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
+                            </View>
+                        ) : (
+                            <View style={{justifyContent:'center'}}>
+                                 <Image source={require('./assets/image/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
+                            </View>
+                        )}
+                        <View style={{justifyContent:'center',marginLeft:15}}>
+                            <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
+                            <Text style={{fontSize: 16}}>{item.class}</Text>
+                        </View>
+                    </View>
+                    <View style={{justifyContent:'center', marginRight:15}}>
+                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}>{item.score}</Text>
+                    </View>
+                </View>
+            );
         }
         return(
             <Overlay isVisible={visibleStartGame} overlayStyle={styles.modalStartButton}>
                 <View style={styles.headerStartButton}>
-                    <Text style={styles.textHeaderStartButton}>Choose Character</Text>
+                    <Text style={styles.textHeaderStartButton}>Top Rank</Text>
                 </View>
-                <View style={{flexDirection: 'row', justifyContent: 'space-around', height: '50%'}}>
-                    <TouchableOpacity onPress={changeMaleCharater} style={[male,{height: 160, width:90}]}>
-                        <Image source={require('./assets/image/character_male_choose.png')} style={{height: 160, width:90}}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={changeFemaleCharater} style={[female,{height: 160, width:90}]}>
-                        <Image source={require('./assets/image/character_female_choose.png')} style={{height: 160, width:90}}/>
-                    </TouchableOpacity>
-                </View>
+                <VirtualizedList
+                    data={rank}
+                    renderItem={({ item, index }) => <Item item={item} index={index} />}
+                    keyExtractor={ ( item,index ) => index.toString() }
+                    getItemCount={(data) => {return 3}}
+                    getItem={(data, index) => data[index]}
+                />
                 <TouchableOpacity style={styles.startButton} onPress={startGame}>
                     <Text style={styles.textStartButton}>Start Game</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.backButton} onPress={backGame}>
+                    <Text style={styles.textBackButton}>Back</Text>
                 </TouchableOpacity>
             </Overlay>
         );
@@ -622,11 +662,25 @@ const App = () => {
         );
     }
 
+    const TimeCountDown = () => {
+        return(
+            <CountDown
+                until={timeClock}
+                size={25}
+                onFinish={onFinishTime}
+                onChange={onChangeTime}
+                timeToShow={['M','S']}
+                timeLabels={{m: null, s: null}}
+                digitStyle={{backgroundColor: 'none', marginLeft:-10}}
+                running={clock}
+                digitTxtStyle={{color: '#cc5c00'}}
+                separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
+                showSeparator
+            />
+        )
+    }
+
     const Rank = () => {
-        let params = {
-            access_token:"ef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca1",
-            lesson_id:"1"
-        }
         // callApi(URL_GETRANKGAME,params);
         const Item = ({ item, index })=> {
             let medal = '';
@@ -693,19 +747,7 @@ const App = () => {
                 <View style={{top: Platform.OS == 'ios' ? -520 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'#ffffff',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
                         <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
-                        <CountDown
-                            until={timeClock}
-                            size={25}
-                            onFinish={onFinishTime}
-                            onChange={onChangeTime}
-                            timeToShow={['M','S']}
-                            timeLabels={{m: null, s: null}}
-                            digitStyle={{backgroundColor: 'none', marginLeft:-10}}
-                            running={clock}
-                            digitTxtStyle={{color: '#cc5c00'}}
-                            separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
-                            showSeparator
-                        />
+                        <TimeCountDown />
                     </View>
                     <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginRight:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
                         <Image source={require('./assets/image/star.gif')} style={{height:40,width:40}} />
@@ -824,12 +866,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff0000',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 20,
         borderRadius: 10,
-        height: '20%'
+        marginBottom: 10,
+        height: '15%'
+    },
+    backButton: {
+        backgroundColor: '#dddddd',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        height: '10%'
     },
     modalStartButton: {
-        height: '45%',
+        height: '50%',
         width: '70%',
         borderRadius: 15,
         justifyContent: 'flex-start'
@@ -837,15 +886,20 @@ const styles = StyleSheet.create({
     headerStartButton: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: '20%'
+        height: '15%'
     },
     textHeaderStartButton: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#ff0000'
+        color: '#000000'
     },
     textStartButton: {
-        color: 'white',
+        color: '#ffffff',
+        fontSize: 26,
+        fontWeight: 'bold'
+    },
+    textBackButton: {
+        color: '#000000',
         fontSize: 26,
         fontWeight: 'bold'
     },
