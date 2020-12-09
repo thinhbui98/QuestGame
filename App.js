@@ -62,7 +62,7 @@ const rank = [
     {
         name:'Nguyen Van A',
         class: 'A123',
-        score: 10
+        score: 9
     }
 ];
 
@@ -187,7 +187,7 @@ const data = [
         'question': 'Ho la ki tu nao trong bang chu cai?',
         'answer': 'ほ'
     },
-];
+].sort(() => Math.random() - 0.5);
 
 const hiragana = [
     'あ', 'い', 'う', 'え', 'お',
@@ -196,6 +196,9 @@ const hiragana = [
     'た', 'ち', 'つ', 'て', 'と',
     'な', 'に', 'ぬ', 'ね', 'の',
     'は', 'ひ', 'ふ', 'へ', 'ほ',
+    'ま', 'み', 'む', 'め', 'も',
+    'ら', 'り', 'る', 'れ', 'ろ',
+    'や', 'ゆ', 'よ', 'わ', 'を', 'ん',
 ];
 
 LogBox.ignoreAllLogs();
@@ -286,6 +289,7 @@ const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
     DEFAULT_CHARATER_TOP_ANIMATED = 280,
     DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 190,
     TIME_DEFAULT = 10,
+    TIME_ANSWER = TIME_DEFAULT * data.length,
     PARAMS = {
         access_token:"ef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca1",
         lesson_id:"1"
@@ -301,41 +305,34 @@ var tempCharaterLeftAnimated = 100,
     tempBackgroundBottomAnimated = 0,
     movingBackground = 0,
     renderAnwser = [],
+    checkAnswer = [],
+    trueAnswer = 0;
     questNum = 0,
     timeLeft = 0,
-    flagFirework = false,
-    timeAnswer = TIME_DEFAULT * data.length
+    flagFirework = false
 
 const App = () => {
     //state
-    const [score, setScore] = useState(0);
-    const [visibleStartGame, setVisibleStartGame] = useState(true);
-    const [visibleResult, setVisibleResult] = useState(false);
-    const [visibleRank, setVisibleRank] = useState(false);
-    const [visibleQuest, setvisibleQuest] = useState(false);
-    const [characterStatus, setcharacterStatus] = useState(false);
-    const [flagAnswer, setFlagAnswer] = useState(true);
-    const [flagQuest, setFlagQuest] = useState(true);
-    const [clock, setClock] = useState(false);
-    const [timeClock, setTimeClock] = useState(timeAnswer);
-    const [disableAnswer, setDisableAnswer] = useState(false);
-    const [chooseMaleCharacter, setChooseMaleCharacter] = useState(true);
-    const [chooseFemaleCharacter, setChooseFemaleCharacter] = useState(true);
-
+    const [score, setScore] = useState(0),
+        [visibleStartGame, setVisibleStartGame] = useState(true),
+        [visibleResult, setVisibleResult] = useState(false),
+        [visibleRank, setVisibleRank] = useState(false),
+        [visibleQuest, setvisibleQuest] = useState(false),
+        [characterStatus, setcharacterStatus] = useState(false),
+        [flagAnswer, setFlagAnswer] = useState(true),
+        [clock, setClock] = useState(false),
+        [timeClock, setTimeClock] = useState(TIME_ANSWER),
+        [disableAnswer, setDisableAnswer] = useState(false),
     //animated
     //trang thai dau tien
-    const charaterLeftAnimated = useRef(new Animated.Value(0)).current;
-    const charaterTopAnimated = useRef(new Animated.Value(DEFAULT_CHARATER_TOP_ANIMATED)).current;
-    const backgroundRightAnimated = useRef(new Animated.Value(0)).current;
-    const backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current;
+        charaterLeftAnimated = useRef(new Animated.Value(0)).current,
+        charaterTopAnimated = useRef(new Animated.Value(DEFAULT_CHARATER_TOP_ANIMATED)).current,
+        backgroundRightAnimated = useRef(new Animated.Value(0)).current,
+        backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current,
+    //render cau hoi va cau tra loi
+        questions = data[questNum].question,
+        answer = [data[questNum].answer];
 
-    const questions = data[questNum].question;
-    const answer = [data[questNum].answer];
-    if (flagQuest) {
-        data.sort(() => Math.random() - 0.5);
-        setFlagQuest(false);
-        console.log('random quest 111111111111111111');
-    }
     if (flagAnswer) {
         let i = 0, temp;
         while (i < 3) {
@@ -349,7 +346,18 @@ const App = () => {
                 }
             }
         }
+        for (let j = 0; j < answer.length; j++) {
+            if (answer[j] == data[questNum].answer) {
+                // checkAnswer[j] = {answer: true,backgroundColor : '#00cc00'};
+                checkAnswer[j] = true;
+                trueAnswer = j;
+            } else {
+                // checkAnswer[j] = {answer: false,backgroundColor : '#ff3300'};
+                checkAnswer[j] = false;
+            }
+        }
         renderAnwser = answer;
+        console.log('checkAnswer',checkAnswer);
         setFlagAnswer(false);
     }
 
@@ -374,6 +382,9 @@ const App = () => {
     const chooseAnswer = (answer,index) => {
         setDisableAnswer(true);
         if (answer == data[questNum].answer) {
+            if (checkAnswer[index]) {
+                checkAnswer[index] = {backgroundColor: '#00cc00'};
+            }
             setClock(false);
             setScore(score + 1);
             setcharacterStatus(true);
@@ -508,17 +519,26 @@ const App = () => {
             }
         } else {
             questNum = 0;
-            setTimeClock(timeAnswer);
-            setVisibleResult(!visibleResult);
+            checkAnswer[index] = {backgroundColor : '#ff3300'};
+            checkAnswer[trueAnswer] = {backgroundColor: '#00cc00'};
+            
             setClock(false);
+            setDisableAnswer(false);
+            setTimeout(() => {
+                setVisibleResult(!visibleResult);
+                // setTimeClock(timeAnswer);
+            }, 2000);
+            
         }
     }
 
     const playAgain = () => {
         questNum = 0;
+        checkAnswer = [];
+        data.sort(() => Math.random() - 0.5)
         setScore(0);
         setClock(true);
-        data.sort(() => Math.random() - 0.5)
+        setFlagAnswer(true);
         setVisibleResult(!visibleResult);
     }
 
@@ -576,7 +596,7 @@ const App = () => {
 
     const onChangeTime = () => {
         timeLeft = timeLeft - 1;
-        console.log(timeLeft);
+        console.log('timeLeft',timeLeft);
     }
 
     const Start = () => {
@@ -663,9 +683,15 @@ const App = () => {
     }
 
     const TimeCountDown = () => {
+        let timeCountDown = 0;
+        if (timeLeft < timeClock) {
+            timeCountDown = timeLeft;
+        } else {
+            timeCountDown = timeClock;
+        }
         return(
             <CountDown
-                until={timeClock}
+                until={timeCountDown}
                 size={25}
                 onFinish={onFinishTime}
                 onChange={onChangeTime}
@@ -707,20 +733,21 @@ const App = () => {
                                  <Image source={require('./assets/image/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
                             </View>
                         )}
-                        <View style={{justifyContent:'center',marginLeft:15}}>
-                            <Text style={{fontSize: 20,fontWeight:'500'}}>{item.name}</Text>
+                        <View style={{justifyContent:'center', marginLeft:15}}>
+                            <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
                             <Text style={{fontSize: 16}}>{item.class}</Text>
                         </View>
                     </View>
-                    <View style={{justifyContent:'center', marginRight:15}}>
-                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}>{item.score}</Text>
+                    <View style={{ marginRight:15, flexDirection:'row', alignItems:'center'}}>
+                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}> {item.score}</Text>
+                        <Image source={require('./assets/image/rank_star.png')} style={{height: 35,width: 35, marginLeft: 10}} />
                     </View>
                 </View>
             );
         }
 
         return(
-            <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={{height:'80%',width:'90%',borderRadius:15}}>
+            <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={styles.modalRank}>
                 <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
                     <Text style={{fontSize:30,fontWeight:'bold'}}>Top Rank</Text>
                 </View>
@@ -754,11 +781,8 @@ const App = () => {
                         <Text style={{fontSize: 25, fontWeight:'bold',color:'#ffcc00'}}>{score < 10 ? '0'+score : score }</Text>
                     </View>
                 </View>
-                {chooseMaleCharacter ? (
-                    <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
-                ) : (
-                    <Animated.Image source={characterStatus ? require('./assets/image/character_female_moving.gif') : require('./assets/image/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
-                )}
+                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                {/* <Animated.Image source={characterStatus ? require('./assets/image/character_female_moving.gif') : require('./assets/image/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
                 {flagFirework ? (
                     <Animated.Image source={require('./assets/image/firework.gif')} style={{height: 100, width: 100, top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated, position:'absolute'}} />
                 ) : (
@@ -770,16 +794,16 @@ const App = () => {
                     <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
                 </ImageBackground>
                 <View style={styles.answer}>
-                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0])}>
+                    <TouchableOpacity style={[styles.answerButton, checkAnswer[0]]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0],0)}>
                         <Text style={styles.answerText}>{renderAnwser[0]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[1])}>
+                    <TouchableOpacity style={[styles.answerButton,checkAnswer[1]]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[1],1)}>
                         <Text style={styles.answerText}>{renderAnwser[1]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[2])}>
+                    <TouchableOpacity style={[styles.answerButton,checkAnswer[2]]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[2],2)}>
                         <Text style={styles.answerText}>{renderAnwser[2]}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.answerButton]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[3])}>
+                    <TouchableOpacity style={[styles.answerButton,checkAnswer[3]]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[3],3)}>
                         <Text style={styles.answerText}>{renderAnwser[3]}</Text>
                     </TouchableOpacity>
                 </View>
@@ -853,6 +877,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    modalRank: {
+        height: '80%',
+        width: '95%',
+        borderRadius: 15
+    },
     rankButton: {
         backgroundColor: 'white',
         flexDirection: 'row',
@@ -879,7 +908,7 @@ const styles = StyleSheet.create({
     },
     modalStartButton: {
         height: '50%',
-        width: '70%',
+        width: '80%',
         borderRadius: 15,
         justifyContent: 'flex-start'
     },
