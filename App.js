@@ -350,7 +350,6 @@ const App = () => {
             if (answer[j] == data[questNum].answer) {
                 // checkAnswer[j] = {answer: true,backgroundColor : '#00cc00'};
                 checkAnswer[j] = true;
-                trueAnswer = j;
             } else {
                 // checkAnswer[j] = {answer: false,backgroundColor : '#ff3300'};
                 checkAnswer[j] = false;
@@ -385,6 +384,7 @@ const App = () => {
             if (checkAnswer[index]) {
                 checkAnswer[index] = {backgroundColor: '#00cc00'};
             }
+            trueAnswer = true;
             setClock(false);
             setScore(score + 1);
             setcharacterStatus(true);
@@ -518,28 +518,50 @@ const App = () => {
                 });
             }
         } else {
+            trueAnswer = false;
             questNum = 0;
             checkAnswer[index] = {backgroundColor : '#ff3300'};
-            checkAnswer[trueAnswer] = {backgroundColor: '#00cc00'};
-            
+            // checkAnswer[trueAnswer] = {backgroundColor: '#00cc00'};
             setClock(false);
             setDisableAnswer(false);
-            setTimeout(() => {
-                setVisibleResult(!visibleResult);
-                // setTimeClock(timeAnswer);
-            }, 2000);
+            setVisibleResult(!visibleResult);
+            setTimeClock(timeClock);
             
         }
     }
 
     const playAgain = () => {
+        data.sort(() => Math.random() - 0.5)
+        if (timeLeft < timeClock) {
+            setTimeClock(timeClock);
+        }
         questNum = 0;
         checkAnswer = [];
-        data.sort(() => Math.random() - 0.5)
         setScore(0);
         setClock(true);
         setFlagAnswer(true);
         setVisibleResult(!visibleResult);
+        tempCharaterLeftAnimated = 100;
+        tempCharaterTopAnimated = 280;
+        Animated.timing(charaterLeftAnimated, {
+            toValue: 0,
+            duration: 0,
+        }).start();
+
+        Animated.timing(charaterTopAnimated, {
+            toValue: DEFAULT_CHARATER_TOP_ANIMATED,
+            duration: 0,
+        }).start();
+
+        Animated.timing(backgroundRightAnimated, {
+            toValue: 0,
+            duration: 0,
+        }).start();
+
+        Animated.timing(backgroundBottomAnimated, {
+            toValue: DEFAULT_BACKGROUND_BOTTOM_ANIMATED,
+            duration: 0,
+        }).start();
     }
 
     const quitGame = () => {
@@ -684,7 +706,7 @@ const App = () => {
 
     const TimeCountDown = () => {
         let timeCountDown = 0;
-        if (timeLeft < timeClock) {
+        if (trueAnswer) {
             timeCountDown = timeLeft;
         } else {
             timeCountDown = timeClock;
