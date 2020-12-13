@@ -16,55 +16,59 @@ import {
 import { Root, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CountDown from 'react-native-countdown-component';
+// import NavigationService from '../../Navigation';
+// import Routes from '../../Navigation/Routes';
 Icon.loadFont();
 
-const rank = [
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 30
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 28
-    },
-    {
-        name:'Nguyen Van C',
-        class: 'A123',
-        score: 27
-    },
-    {
-        name:'Nguyen Van D',
-        class: 'B123',
-        score: 23
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 21
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 17
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 17
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 16
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 9
-    }
-];
+// const rank = [
+//     {
+//         name:'Nguyen Van A',
+//         class: 'A123',
+//         score: 30
+//     },
+//     {
+//         name:'Nguyen Van B',
+//         class: 'B199',
+//         score: 28
+//     },
+//     {
+//         name:'Nguyen Van C',
+//         class: 'A123',
+//         score: 27
+//     },
+//     {
+//         name:'Nguyen Van D',
+//         class: 'B123',
+//         score: 23
+//     },
+//     {
+//         name:'Nguyen Van A',
+//         class: 'A123',
+//         score: 21
+//     },
+//     {
+//         name:'Nguyen Van B',
+//         class: 'B199',
+//         score: 17
+//     },
+//     {
+//         name:'Nguyen Van A',
+//         class: 'A123',
+//         score: 17
+//     },
+//     {
+//         name:'Nguyen Van B',
+//         class: 'B199',
+//         score: 16
+//     },
+//     {
+//         name:'Nguyen Van A',
+//         class: 'A123',
+//         score: 9
+//     }
+// ];
+
+const rank = [];
 
 const data = [
     {
@@ -198,96 +202,34 @@ const hiragana = [
     'は', 'ひ', 'ふ', 'へ', 'ほ',
     'ま', 'み', 'む', 'め', 'も',
     'ら', 'り', 'る', 'れ', 'ろ',
-    'や', 'ゆ', 'よ', 'わ', 'を', 'ん',
+    'や', 'ゆ', 'よ',
+    'わ', 'を', 'ん',
+    'が', 'ぎ', 'ぐ', 'げ', 'ご',
+    'ざ', 'じ', 'ず', 'ぜ', 'ぞ',
+    'だ', 'ぢ', 'づ', 'で', 'ど',
+    'ば', 'び', 'ぶ', 'べ', 'ぼ',
+    'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ',
+    'きゃ', 'きゅ', 'きょ',
+    'しゃ', 'しゅ', 'しょ',
+    'ちゃ', 'ちゅ', 'ちょ',
+    'にゃ', 'にゅ', 'にょ',
+    'ひゃ', 'ひゅ', 'ひょ',
+    'みゃ', 'みゅ', 'みょ',
+    'りゃ', 'りゅ', 'りょ',
+    'ぎゃ', 'ぎゅ', 'ぎょ',
+    'じゃ', 'じゅ', 'じょ',
+    'ぢゃ', 'ぢゅ', 'ぢょ',
+    'びゃ', 'びゅ', 'びょ',
+    'ぴゃ', 'ぴゅ', 'ぴょ'
 ];
 
 LogBox.ignoreAllLogs();
-//ios
-//charaterLeftAnimated: 0
-//charaterTopAnimated: 290
-//backgroundRightAnimated: 0
-//backgroundBottomAnimated: 180
-//tempCharaterLeftAnimated: 100
-//tempCharaterTopAnimated: 290
-//tempBackgroundRightAnimated: 0
-//tempBackgroundBottomAnimated: 0
-
-// switch (movingBackground) {
-//     case 1:
-//         console.log('case1');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
-//         break;
-//     case 2:
-//         console.log('case2');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-//         break;
-//     case 3:
-//         console.log('case3');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-//         break;
-//     default:
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
-//         // tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 60;
-//         break;
-// }
-
-//android
-//charaterLeftAnimated: 0
-//charaterTopAnimated: 260
-//backgroundRightAnimated: 0
-//backgroundBottomAnimated: 210
-//tempCharaterLeftAnimated: 100
-//tempCharaterTopAnimated: 260
-//tempBackgroundRightAnimated: 0
-//tempBackgroundBottomAnimated: 0
-
-// switch (movingBackground) {
-//     case 1:
-//         console.log('case1');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - (Platform.OS == 'ios' ? 90 : 110);
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + (Platform.OS == 'ios' ? 20 : 30);
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + (Platform.OS == 'ios' ? 150 : 180);
-//         break;
-//     case 2:
-//         console.log('case2');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-//         break;
-//     case 3:
-//         console.log('case3');
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
-//         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-//         break;
-//     default:
-//         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
-//         tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
-//         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
-//         break;
-// }
-
-
 const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
     URL_GETRANKGAME = 'http://haki.work/api/getRankGame',
     windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,
-    DEFAULT_CHARATER_TOP_ANIMATED = 280,
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 190,
+    DEFAULT_CHARATER_TOP_ANIMATED = 300,
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 170,
     TIME_DEFAULT = 10,
     TIME_ANSWER = TIME_DEFAULT * data.length,
     PARAMS = {
@@ -297,16 +239,14 @@ const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
 
     console.log('windowWidth',windowWidth);
     console.log('windowHeight',windowHeight);
-    console.log('width quest',windowWidth * 0.85);
-    console.log('height quest',windowHeight - (windowWidth * 0.85));
 var tempCharaterLeftAnimated = 100,
-    tempCharaterTopAnimated = 280,
+    tempCharaterTopAnimated = 300,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
     movingBackground = 0,
     renderAnwser = [],
     checkAnswer = [],
-    trueAnswer = 0;
+    trueAnswer = false;
     questNum = 0,
     timeLeft = 0,
     flagFirework = false
@@ -348,10 +288,8 @@ const App = () => {
         }
         for (let j = 0; j < answer.length; j++) {
             if (answer[j] == data[questNum].answer) {
-                // checkAnswer[j] = {answer: true,backgroundColor : '#00cc00'};
                 checkAnswer[j] = true;
             } else {
-                // checkAnswer[j] = {answer: false,backgroundColor : '#ff3300'};
                 checkAnswer[j] = false;
             }
         }
@@ -395,6 +333,7 @@ const App = () => {
                     duration: 3000,
                 }).start(( {finished} ) => {
                     if (finished) {
+                        console.log('charaterLeftAnimated1 stop')
                         questNum++;
                         setFlagAnswer(true);
                         setClock(true);
@@ -420,16 +359,17 @@ const App = () => {
                     //di chuyen background va nhan vat theo so diem
                     console.log('charaterTopAnimated2 stop')
                     if (finished) {
+                        //neu nhat vat di duoc 1/2 width man hinh thi se di chuyen background
                         if (tempCharaterLeftAnimated > windowWidth/2) {
+                            //tinh so lan di chuyen background
                             movingBackground = movingBackground + 1;
-                            console.log('movingBackground',movingBackground);
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
                                     tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 150;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 140;
                                     break;
                                 case 2:
                                     console.log('case2');
@@ -481,7 +421,7 @@ const App = () => {
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
-                                    console.log('charaterLeftAnimated2 stop')
+                                    console.log('charaterLeftAnimated3 stop')
                                 }
                             });
                             Animated.timing(charaterTopAnimated, {
@@ -489,6 +429,7 @@ const App = () => {
                                 duration: 1000,
                             }).start(( {finished} ) => {
                                 if (finished) {
+                                    console.log('tempCharaterTopAnimated3 stop')
                                     if (questNum == data.length - 1) {
                                         flagFirework = true;
                                         setVisibleResult(!visibleResult);
@@ -498,7 +439,6 @@ const App = () => {
                                         setClock(true);
                                         setFlagAnswer(true);
                                         setDisableAnswer(false);
-                                        console.log('tempCharaterTopAnimated2 stop')
                                     }
                                 }
                             });
@@ -521,28 +461,26 @@ const App = () => {
             trueAnswer = false;
             questNum = 0;
             checkAnswer[index] = {backgroundColor : '#ff3300'};
-            // checkAnswer[trueAnswer] = {backgroundColor: '#00cc00'};
             setClock(false);
             setDisableAnswer(false);
             setVisibleResult(!visibleResult);
-            setTimeClock(timeClock);
+            setTimeClock(TIME_ANSWER);
             
         }
     }
 
     const playAgain = () => {
         data.sort(() => Math.random() - 0.5)
-        if (timeLeft < timeClock) {
-            setTimeClock(timeClock);
-        }
+        timeLeft = TIME_ANSWER;
         questNum = 0;
         checkAnswer = [];
+        flagFirework = false;
         setScore(0);
         setClock(true);
         setFlagAnswer(true);
         setVisibleResult(!visibleResult);
         tempCharaterLeftAnimated = 100;
-        tempCharaterTopAnimated = 280;
+        tempCharaterTopAnimated = 300;
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
@@ -565,15 +503,19 @@ const App = () => {
     }
 
     const quitGame = () => {
-        alert('quitGame')
+        // if (visibleResult) {
+        //     setVisibleResult(!visibleResult);
+        // }
+        // data.sort(() => Math.random() - 0.5)
+        // NavigationService.navigate(Routes.LOGIN_SCREEN)
         questNum = 0;
         setClock(false);
-        setTimeClock(timeClock);
+        setTimeClock(TIME_ANSWER);
         setScore(0);
         data.sort(() => Math.random() - 0.5)
         setVisibleResult(false);
-        tempCharaterLeftAnimated = 140;
-        tempCharaterTopAnimated = 270;
+        tempCharaterLeftAnimated = 100;
+        tempCharaterTopAnimated = 300;
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
@@ -596,7 +538,8 @@ const App = () => {
     }
 
     const backGame = () => {
-        alert('back Game')
+        // setVisibleStartGame(!visibleStartGame);
+        // NavigationService.navigate(Routes.LOGIN_SCREEN);
     }
 
     const modalRank = () => {
@@ -608,11 +551,13 @@ const App = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
         setClock(true);
-        timeLeft = timeClock;
+        setTimeClock(TIME_ANSWER);
+        timeLeft = TIME_ANSWER;
     }
 
     const onFinishTime = () => {
         setClock(false);
+        setTimeClock(TIME_ANSWER);
         setVisibleResult(!visibleResult);
     }
 
@@ -639,22 +584,13 @@ const App = () => {
             return (
                 <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 60}}>
                     <View style={{flexDirection:'row'}}>
-                        {medal != '' ? (
-                            <View style={{justifyContent:'center'}}>
-                                <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
-                            </View>
-                        ) : (
-                            <View style={{justifyContent:'center'}}>
-                                 <Image source={require('./assets/image/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
-                            </View>
-                        )}
+                        <View style={{justifyContent:'center'}}>
+                            <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
+                        </View>
                         <View style={{justifyContent:'center',marginLeft:15}}>
                             <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
                             <Text style={{fontSize: 16}}>{item.class}</Text>
                         </View>
-                    </View>
-                    <View style={{justifyContent:'center', marginRight:15}}>
-                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}>{item.score}</Text>
                     </View>
                 </View>
             );
@@ -664,18 +600,25 @@ const App = () => {
                 <View style={styles.headerStartButton}>
                     <Text style={styles.textHeaderStartButton}>Top Rank</Text>
                 </View>
-                <VirtualizedList
+                {rank.length > 0 ? (
+                    <VirtualizedList
                     data={rank}
                     renderItem={({ item, index }) => <Item item={item} index={index} />}
                     keyExtractor={ ( item,index ) => index.toString() }
                     getItemCount={(data) => {return 3}}
                     getItem={(data, index) => data[index]}
                 />
+                ) : (
+                    <View style={{alignItems:'center',height:'55%'}}>
+                        <Image source={require('./assets/image/no_player.png')} style={{height: 170, width: 170}}/>
+                        <Text style={{fontSize: 20, fontWeight: 'bold'}}>Chưa có người chơi</Text>
+                    </View>
+                )}
                 <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.textStartButton}>Start Game</Text>
+                    <Text style={styles.textStartButton}>Bắt Đầu</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.backButton} onPress={backGame}>
-                    <Text style={styles.textBackButton}>Back</Text>
+                    <Text style={styles.textBackButton}>Quay Lại</Text>
                 </TouchableOpacity>
             </Overlay>
         );
@@ -690,14 +633,14 @@ const App = () => {
                 </View>
                 <View style={styles.bodyResult}>
                     <Text style={styles.scoreResult}>{score}</Text>
-                    <Text style={{fontSize:18}}>You answer correctly {score} / {data.length}</Text>
+                    {/* <Text style={{fontSize:18}}>You answer correctly {score} / {data.length}</Text> */}
                 </View>
                 <View style={{flexDirection: 'row',justifyContent:'space-around',height:'20%'}}>
                     <TouchableOpacity onPress={playAgain} style={{backgroundColor:'#66b3ff', height:40, justifyContent:'center', width:'40%', borderRadius:10}}>
-                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Play Again</Text>
+                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Chơi Lại</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={quitGame} style={{backgroundColor:'#ff0000', height:40, justifyContent:'center', width:'40%', borderRadius: 10}}>
-                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Quit</Text>
+                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Thoát</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
@@ -709,7 +652,7 @@ const App = () => {
         if (trueAnswer) {
             timeCountDown = timeLeft;
         } else {
-            timeCountDown = timeClock;
+            timeCountDown = TIME_ANSWER;
         }
         return(
             <CountDown
@@ -773,16 +716,23 @@ const App = () => {
                 <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
                     <Text style={{fontSize:30,fontWeight:'bold'}}>Top Rank</Text>
                 </View>
-                <VirtualizedList
-                    data={rank}
-                    renderItem={({ item, index }) => <Item item={item} index={index} />}
-                    keyExtractor={ ( item,index ) => index.toString() }
-                    getItemCount={(data) => {return data.length}}
-                    getItem={(data, index) => data[index]}
-                />
-                <View style={{justifyContent:'center',height:'10%'}}>
+                {rank.length > 0 ? (
+                    <VirtualizedList
+                        data={rank}
+                        renderItem={({ item, index }) => <Item item={item} index={index} />}
+                        keyExtractor={ ( item,index ) => index.toString() }
+                        getItemCount={(data) => {return data.length}}
+                        getItem={(data, index) => data[index]}
+                    />
+                ) : (
+                    <View style={{alignItems:'center',height:'80%'}}>
+                        <Image source={require('./assets/image/no_player.png')} style={{height: 200, width: 200}}/>
+                        <Text style={{fontSize: 24, fontWeight: 'bold'}}>Chưa có người chơi</Text>
+                    </View>
+                )}
+                <View style={{justifyContent:'center',height:'10%' }}>
                     <TouchableOpacity onPress={modalRank} style={{justifyContent:'center',height:'60%',width:'50%',backgroundColor:'#ff0000',alignSelf:'center',borderRadius:5}}>
-                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Close</Text>
+                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Đóng</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
@@ -791,9 +741,9 @@ const App = () => {
 
     return (
         <View style={styles.background}>
-            <View style={{ height: windowWidth}}>
+            <View style={{ height: windowWidth * 0.9}}>
                 <Animated.Image source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,right:backgroundRightAnimated,position:'relative'}} />
-                <View style={{top: Platform.OS == 'ios' ? -520 : -540,flexDirection: 'row',justifyContent: 'space-between'}}>
+                <View style={{top: Platform.OS == 'ios' ? -540 : -560,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'#ffffff',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
                         <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
                         <TimeCountDown />
@@ -832,11 +782,11 @@ const App = () => {
                 <View style={styles.footerButton}>
                     <TouchableOpacity style={styles.quitButton} onPress={quitGame}>
                         <Icon name="arrow-circle-left" size={30} color="#ffffff" />
-                        <Text style={styles.titleQuitButton}>Quit</Text>
+                        <Text style={styles.titleQuitButton}>Thoát</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
                         <Icon name="trophy" size={30} color="#ff0000" /> 
-                        <Text  style={styles.titleRankButton}>Charts</Text>
+                        <Text style={styles.titleRankButton}>Xếp Hạng</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -853,13 +803,14 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        backgroundColor: '#00ffbf'
+        // backgroundColor: '#00ffbf'
     },
     backgroundQuest: {
-        justifyContent: 'center'
+        justifyContent: 'center',
+         backgroundColor: '#00ffbf'
     },
     quest: {
-        marginTop: Platform.OS == 'ios' ? -40 : -60,
+        marginTop: 5,
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%'
@@ -930,7 +881,7 @@ const styles = StyleSheet.create({
     },
     modalStartButton: {
         height: '50%',
-        width: '80%',
+        width: '70%',
         borderRadius: 15,
         justifyContent: 'flex-start'
     },
@@ -946,13 +897,12 @@ const styles = StyleSheet.create({
     },
     textStartButton: {
         color: '#ffffff',
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold'
     },
     textBackButton: {
         color: '#000000',
-        fontSize: 26,
-        fontWeight: 'bold'
+        fontSize: 26
     },
     modalResult: {
         height: '45%',
