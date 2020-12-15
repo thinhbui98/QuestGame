@@ -16,179 +16,181 @@ import {
 import { Root, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CountDown from 'react-native-countdown-component';
-// import NavigationService from '../../Navigation';
-// import Routes from '../../Navigation/Routes';
-Icon.loadFont();
+import NavigationService from '../../Navigation';
+import Routes from '../../Navigation/Routes';
+import {ButtonX} from '../../Components';
+import { ACCESS_TOKEN,HTTP_CODE } from '../../Constants';
+import ENV from '../../Config';
 
-// const rank = [
-//     {
-//         name:'Nguyen Van A',
-//         class: 'A123',
-//         score: 30
-//     },
-//     {
-//         name:'Nguyen Van B',
-//         class: 'B199',
-//         score: 28
-//     },
-//     {
-//         name:'Nguyen Van C',
-//         class: 'A123',
-//         score: 27
-//     },
-//     {
-//         name:'Nguyen Van D',
-//         class: 'B123',
-//         score: 23
-//     },
-//     {
-//         name:'Nguyen Van A',
-//         class: 'A123',
-//         score: 21
-//     },
-//     {
-//         name:'Nguyen Van B',
-//         class: 'B199',
-//         score: 17
-//     },
-//     {
-//         name:'Nguyen Van A',
-//         class: 'A123',
-//         score: 17
-//     },
-//     {
-//         name:'Nguyen Van B',
-//         class: 'B199',
-//         score: 16
-//     },
-//     {
-//         name:'Nguyen Van A',
-//         class: 'A123',
-//         score: 9
-//     }
-// ];
+const rank = [
+    {
+        name:'Nguyen Van A',
+        class: 'A123',
+        score: 30
+    },
+    {
+        name:'Nguyen Van B',
+        class: 'B199',
+        score: 28
+    },
+    {
+        name:'Nguyen Van C',
+        class: 'A123',
+        score: 27
+    },
+    {
+        name:'Nguyen Van D',
+        class: 'B123',
+        score: 23
+    },
+    {
+        name:'Nguyen Van A',
+        class: 'A123',
+        score: 21
+    },
+    {
+        name:'Nguyen Van B',
+        class: 'B199',
+        score: 17
+    },
+    {
+        name:'Nguyen Van A',
+        class: 'A123',
+        score: 17
+    },
+    {
+        name:'Nguyen Van B',
+        class: 'B199',
+        score: 16
+    },
+    {
+        name:'Nguyen Van A',
+        class: 'A123',
+        score: 9
+    }
+];
 
-const rank = [];
+// const rank = [];
 
 const data = [
     {
-        'question': 'A la ki tu nao trong bang chu cai?',
+        'question': 'A là kí tự nào dưới đây?',
         'answer': 'あ'
     },
     {
-        'question': 'I la ki tu nao trong bang chu cai?',
+        'question': 'I là kí tự nào dưới đây?',
         'answer': 'い'
     },
     {
-        'question': 'U la ki tu nao trong bang chu cai?',
+        'question': 'U là kí tự nào dưới đây?',
         'answer': 'う'
     },
     {
-        'question': 'E la ki tu nao trong bang chu cai?',
+        'question': 'E là kí tự nào dưới đây?',
         'answer': 'え'
     },
     {
-        'question': 'O la ki tu nao trong bang chu cai?',
+        'question': 'O là kí tự nào dưới đây?',
         'answer': 'お'
     },
     {
-        'question': 'Ka la ki tu nao trong bang chu cai?',
+        'question': 'Ka là kí tự nào dưới đây?',
         'answer': 'か'
     },
     {
-        'question': 'Ki la ki tu nao trong bang chu cai?',
+        'question': 'Ki là kí tự nào dưới đây?',
         'answer': 'き'
     },
     {
-        'question': 'Ku la ki tu nao trong bang chu cai?',
+        'question': 'Ku là kí tự nào dưới đây?',
         'answer': 'く'
     },
     {
-        'question': 'Ke la ki tu nao trong bang chu cai?',
+        'question': 'Ke là kí tự nào dưới đây?',
         'answer': 'け'
     },
     {
-        'question': 'Ko la ki tu nao trong bang chu cai?',
+        'question': 'Ko là kí tự nào dưới đây?',
         'answer': 'こ'
     },
     {
-        'question': 'Sa la ki tu nao trong bang chu cai?',
+        'question': 'Sa là kí tự nào dưới đây?',
         'answer': 'さ'
     },
     {
-        'question': 'Shi la ki tu nao trong bang chu cai?',
+        'question': 'Shi là kí tự nào dưới đây?',
         'answer': 'し'
     },
     {
-        'question': 'Su la ki tu nao trong bang chu cai?',
+        'question': 'Su là kí tự nào dưới đây?',
         'answer': 'す'
     },
     {
-        'question': 'Se la ki tu nao trong bang chu cai?',
+        'question': 'Se là kí tự nào dưới đây?',
         'answer': 'せ'
     },
     {
-        'question': 'So la ki tu nao trong bang chu cai?',
+        'question': 'So là kí tự nào dưới đây?',
         'answer': 'そ'
     },
     {
-        'question': 'Ta la ki tu nao trong bang chu cai?',
+        'question': 'Ta là kí tự nào dưới đây?',
         'answer': 'た'
     },
     {
-        'question': 'Chi la ki tu nao trong bang chu cai?',
+        'question': 'Chi là kí tự nào dưới đây?',
         'answer': 'ち'
     },
     {
-        'question': 'Tsu la ki tu nao trong bang chu cai?',
+        'question': 'Tsu là kí tự nào dưới đây?',
         'answer': 'つ'
     },
     {
-        'question': 'Te la ki tu nao trong bang chu cai?',
+        'question': 'Te là kí tự nào dưới đây?',
         'answer': 'て'
     },
     {
-        'question': 'To la ki tu nao trong bang chu cai?',
+        'question': 'To là kí tự nào dưới đây?',
         'answer': 'と'
     },
     {
-        'question': 'Na la ki tu nao trong bang chu cai?',
+        'question': 'Na là kí tự nào dưới đây?',
         'answer': 'な'
     },
     {
-        'question': 'Ni la ki tu nao trong bang chu cai?',
+        'question': 'Ni là kí tự nào dưới đây?',
         'answer': 'に'
     },
     {
-        'question': 'Nu la ki tu nao trong bang chu cai?',
+        'question': 'Nu là kí tự nào dưới đây?',
         'answer': 'ぬ'
     },
     {
-        'question': 'Ne la ki tu nao trong bang chu cai?',
+        'question': 'Ne là kí tự nào dưới đây?',
         'answer': 'ね'
     },
     {
-        'question': 'No la ki tu nao trong bang chu cai?',
+        'question': 'No là kí tự nào dưới đây?',
         'answer': 'の'
     },
     {
-        'question': 'Ha la ki tu nao trong bang chu cai?',
+        'question': 'Ha là kí tự nào dưới đây?',
         'answer': 'は'
     },
     {
-        'question': 'Hi la ki tu nao trong bang chu cai?',
+        'question': 'Hi là kí tự nào dưới đây?',
         'answer': 'ひ'
     },
     {
-        'question': 'Fu la ki tu nao trong bang chu cai?',
+        'question': 'Fu là kí tự nào dưới đây?',
         'answer': 'ふ'
     },
     {
-        'question': 'He la ki tu nao trong bang chu cai?',
+        'question': 'He là kí tự nào dưới đây?',
         'answer': 'へ'
     },
     {
-        'question': 'Ho la ki tu nao trong bang chu cai?',
+        'question': 'Ho là kí tự nào dưới đây?',
         'answer': 'ほ'
     },
 ].sort(() => Math.random() - 0.5);
@@ -224,12 +226,10 @@ const hiragana = [
 ];
 
 LogBox.ignoreAllLogs();
-const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
-    URL_GETRANKGAME = 'http://haki.work/api/getRankGame',
-    windowWidth = Dimensions.get('window').width,
+const windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,
-    DEFAULT_CHARATER_TOP_ANIMATED = 300,
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 170,
+    DEFAULT_CHARATER_TOP_ANIMATED = 220,
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250,
     TIME_DEFAULT = 10,
     TIME_ANSWER = TIME_DEFAULT * data.length,
     PARAMS = {
@@ -237,21 +237,38 @@ const URL_SETSCORE = 'http://arigato.haki.work/api/setResultGame',
         lesson_id:"1"
     }
 
-    console.log('windowWidth',windowWidth);
-    console.log('windowHeight',windowHeight);
 var tempCharaterLeftAnimated = 100,
-    tempCharaterTopAnimated = 300,
+    tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
     movingBackground = 0,
     renderAnwser = [],
     checkAnswer = [],
-    trueAnswer = false;
+    trueAnswer = 0;
     questNum = 0,
     timeLeft = 0,
+    timeCountDown = 0,
     flagFirework = false
 
-const App = () => {
+const QuestGameScreen = ({route, navigation}) => {
+    const { title, lesson_id } = route.params;
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            title: title,
+            headerRight :  () => (<ButtonX
+                onPress={modalRank}
+                tKey={'Xếp Hạng'}
+                style={{
+                    height: 40,
+                    width: 120,
+                    backgroundColor : '#ff0000'
+                }}
+            />),
+            // headerLeft : () =>(
+            //     <Text>123123</Text>
+            // )
+        });
+    }, [navigation]);
     //state
     const [score, setScore] = useState(0),
         [visibleStartGame, setVisibleStartGame] = useState(true),
@@ -298,24 +315,6 @@ const App = () => {
         setFlagAnswer(false);
     }
 
-    const callApi = (url,params) => {
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        })
-        .then((response) => response.json())
-        .then((json) => {
-            console.log(json);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-    }
-
     const chooseAnswer = (answer,index) => {
         setDisableAnswer(true);
         if (answer == data[questNum].answer) {
@@ -330,7 +329,7 @@ const App = () => {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
                     toValue: windowWidth/4,
-                    duration: 3000,
+                    duration: 2000,
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('charaterLeftAnimated1 stop')
@@ -342,11 +341,11 @@ const App = () => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20;
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 5;
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 2.5;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
-                    duration: 2000, 
+                    duration: 1000, 
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('charaterLeftAnimated2 stop')
@@ -354,7 +353,7 @@ const App = () => {
                 });
                 Animated.timing(charaterTopAnimated, {
                     toValue: tempCharaterTopAnimated,
-                    duration: 2000, 
+                    duration: 1000, 
                 }).start(( {finished} ) => { 
                     //di chuyen background va nhan vat theo so diem
                     console.log('charaterTopAnimated2 stop')
@@ -366,10 +365,10 @@ const App = () => {
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 90;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 20;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 50;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 140;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 200;
                                     break;
                                 case 2:
                                     console.log('case2');
@@ -470,17 +469,19 @@ const App = () => {
     }
 
     const playAgain = () => {
-        data.sort(() => Math.random() - 0.5)
+        data.sort(() => Math.random() - 0.5);
         timeLeft = TIME_ANSWER;
         questNum = 0;
         checkAnswer = [];
         flagFirework = false;
+        movingBackground = 0;
+        tempCharaterLeftAnimated = 100;
+        tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED;
         setScore(0);
         setClock(true);
         setFlagAnswer(true);
+        setDisableAnswer(false);
         setVisibleResult(!visibleResult);
-        tempCharaterLeftAnimated = 100;
-        tempCharaterTopAnimated = 300;
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
@@ -503,43 +504,16 @@ const App = () => {
     }
 
     const quitGame = () => {
-        // if (visibleResult) {
-        //     setVisibleResult(!visibleResult);
-        // }
-        // data.sort(() => Math.random() - 0.5)
-        // NavigationService.navigate(Routes.LOGIN_SCREEN)
-        questNum = 0;
-        setClock(false);
-        setTimeClock(TIME_ANSWER);
-        setScore(0);
-        data.sort(() => Math.random() - 0.5)
-        setVisibleResult(false);
-        tempCharaterLeftAnimated = 100;
-        tempCharaterTopAnimated = 300;
-        Animated.timing(charaterLeftAnimated, {
-            toValue: 0,
-            duration: 0,
-        }).start();
-
-        Animated.timing(charaterTopAnimated, {
-            toValue: DEFAULT_CHARATER_TOP_ANIMATED,
-            duration: 0,
-        }).start();
-
-        Animated.timing(backgroundRightAnimated, {
-            toValue: 0,
-            duration: 0,
-        }).start();
-
-        Animated.timing(backgroundBottomAnimated, {
-            toValue: DEFAULT_BACKGROUND_BOTTOM_ANIMATED,
-            duration: 0,
-        }).start();
+        if (visibleResult) {
+            setVisibleResult(!visibleResult);
+        }
+        data.sort(() => Math.random() - 0.5);
+        navigation.goBack();
     }
 
     const backGame = () => {
-        // setVisibleStartGame(!visibleStartGame);
-        // NavigationService.navigate(Routes.LOGIN_SCREEN);
+        setVisibleStartGame(!visibleStartGame);
+        navigation.goBack();
     }
 
     const modalRank = () => {
@@ -572,13 +546,13 @@ const App = () => {
             let medal = '';
             switch (index) {
                 case 0:
-                    medal = require('./assets/image/medal_icon_01.png');
+                    medal = require('../../Assets/game/medal_icon_01.png');
                     break;
                 case 1:
-                    medal = require('./assets/image/medal_icon_02.png');
+                    medal = require('../../Assets/game/medal_icon_02.png');
                     break;
                 case 2:
-                    medal = require('./assets/image/medal_icon_03.png');
+                    medal = require('../../Assets/game/medal_icon_03.png');
                     break;
             }
             return (
@@ -602,15 +576,15 @@ const App = () => {
                 </View>
                 {rank.length > 0 ? (
                     <VirtualizedList
-                    data={rank}
-                    renderItem={({ item, index }) => <Item item={item} index={index} />}
-                    keyExtractor={ ( item,index ) => index.toString() }
-                    getItemCount={(data) => {return 3}}
-                    getItem={(data, index) => data[index]}
-                />
+                        data={rank}
+                        renderItem={({ item, index }) => <Item item={item} index={index} />}
+                        keyExtractor={ ( item,index ) => index.toString() }
+                        getItemCount={(data) => {return 3}}
+                        getItem={(data, index) => data[index]}
+                    />
                 ) : (
                     <View style={{alignItems:'center',height:'55%'}}>
-                        <Image source={require('./assets/image/no_player.png')} style={{height: 170, width: 170}}/>
+                        <Image source={require('../../Assets/game/no_player.png')} style={{height: 170, width: 170}}/>
                         <Text style={{fontSize: 20, fontWeight: 'bold'}}>Chưa có người chơi</Text>
                     </View>
                 )}
@@ -626,6 +600,7 @@ const App = () => {
 
     const Result = () => {
         // callApi(URL_SETSCORE)
+        
         return(
             <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={styles.modalResult}>
                 <View style={styles.headerResult}>
@@ -648,11 +623,9 @@ const App = () => {
     }
 
     const TimeCountDown = () => {
-        let timeCountDown = 0;
+        timeCountDown = timeClock;
         if (trueAnswer) {
             timeCountDown = timeLeft;
-        } else {
-            timeCountDown = TIME_ANSWER;
         }
         return(
             <CountDown
@@ -677,13 +650,13 @@ const App = () => {
             let medal = '';
             switch (index) {
                 case 0:
-                    medal = require('./assets/image/medal_icon_01.png');
+                    medal = require('../../Assets/game/medal_icon_01.png');
                     break;
                 case 1:
-                    medal = require('./assets/image/medal_icon_02.png');
+                    medal = require('../../Assets/game/medal_icon_02.png');
                     break;
                 case 2:
-                    medal = require('./assets/image/medal_icon_03.png');
+                    medal = require('../../Assets/game/medal_icon_03.png');
                     break;
             }
             return (
@@ -695,7 +668,7 @@ const App = () => {
                             </View>
                         ) : (
                             <View style={{justifyContent:'center'}}>
-                                 <Image source={require('./assets/image/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
+                                <Image source={require('../../Assets/game/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
                             </View>
                         )}
                         <View style={{justifyContent:'center', marginLeft:15}}>
@@ -705,12 +678,11 @@ const App = () => {
                     </View>
                     <View style={{ marginRight:15, flexDirection:'row', alignItems:'center'}}>
                         <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}> {item.score}</Text>
-                        <Image source={require('./assets/image/rank_star.png')} style={{height: 35,width: 35, marginLeft: 10}} />
+                        <Image source={require('../../Assets/game/rank_star.png')} style={{height: 35,width: 35, marginLeft: 10}} />
                     </View>
                 </View>
             );
         }
-
         return(
             <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={styles.modalRank}>
                 <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
@@ -726,13 +698,13 @@ const App = () => {
                     />
                 ) : (
                     <View style={{alignItems:'center',height:'80%'}}>
-                        <Image source={require('./assets/image/no_player.png')} style={{height: 200, width: 200}}/>
+                        <Image source={require('../../Assets/game/no_player.png')} style={{height: 200, width: 200}}/>
                         <Text style={{fontSize: 24, fontWeight: 'bold'}}>Chưa có người chơi</Text>
                     </View>
                 )}
-                <View style={{justifyContent:'center',height:'10%' }}>
+                <View style={{justifyContent:'center',height:'10%'}}>
                     <TouchableOpacity onPress={modalRank} style={{justifyContent:'center',height:'60%',width:'50%',backgroundColor:'#ff0000',alignSelf:'center',borderRadius:5}}>
-                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Đóng</Text>
+                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Close</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
@@ -741,28 +713,28 @@ const App = () => {
 
     return (
         <View style={styles.background}>
-            <View style={{ height: windowWidth * 0.9}}>
-                <Animated.Image source={require('./assets/image/background_game.png')} style={{height: 540,width: 960,bottom: backgroundBottomAnimated,right:backgroundRightAnimated,position:'relative'}} />
-                <View style={{top: Platform.OS == 'ios' ? -540 : -560,flexDirection: 'row',justifyContent: 'space-between'}}>
-                    <View style={{width: 130,height:60,borderRadius:15,backgroundColor:'#ffffff',marginTop:40, marginLeft:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
-                        <Image source={require('./assets/image/hourglass.gif')} style={{height:35,width:35,marginLeft:10}} />
+            <View style={{ height: windowWidth * 0.7}}>
+                <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame,{bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
+                <View style={{top: Platform.OS == 'ios' ? -550 : -560,flexDirection: 'row',justifyContent: 'space-between'}}>
+                    <View style={styles.clockCountDown}>
+                        <Image source={require('../../Assets/game/hourglass.gif')} style={styles.hourGlass} />
                         <TimeCountDown />
                     </View>
-                    <View style={{width:90,height:60,borderRadius:15,backgroundColor:'white',marginTop:40, marginRight:15,justifyContent:'center', alignItems:'center',flexDirection: 'row'}}>
-                        <Image source={require('./assets/image/star.gif')} style={{height:40,width:40}} />
+                    <View style={styles.pointGame}>
+                        <Image source={require('../../Assets/game/star.gif')} style={{height:40,width:40}} />
                         <Text style={{fontSize: 25, fontWeight:'bold',color:'#ffcc00'}}>{score < 10 ? '0'+score : score }</Text>
                     </View>
                 </View>
-                <Animated.Image source={characterStatus ? require('./assets/image/character_male_moving.gif') : require('./assets/image/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
-                {/* <Animated.Image source={characterStatus ? require('./assets/image/character_female_moving.gif') : require('./assets/image/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
+                <Animated.Image source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
                 {flagFirework ? (
-                    <Animated.Image source={require('./assets/image/firework.gif')} style={{height: 100, width: 100, top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated, position:'absolute'}} />
+                    <Animated.Image source={require('../../Assets/game/firework.gif')} style={{height: 100, width: 100, top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated, position:'absolute'}} />
                 ) : (
                     <View></View>
                 )}
             </View>
             <View style={[styles.backgroundQuest, {height: windowHeight - (windowWidth * 0.9)}]}>
-                <ImageBackground source={require('./assets/image/hexagon.png')} style={[styles.quest,{height: '16%'}]}>
+                <ImageBackground source={require('../../Assets/game//hexagon.png')} style={[styles.quest,{height: '16%'}]}>
                     <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
                 </ImageBackground>
                 <View style={styles.answer}>
@@ -779,16 +751,6 @@ const App = () => {
                         <Text style={styles.answerText}>{renderAnwser[3]}</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.footerButton}>
-                    <TouchableOpacity style={styles.quitButton} onPress={quitGame}>
-                        <Icon name="arrow-circle-left" size={30} color="#ffffff" />
-                        <Text style={styles.titleQuitButton}>Thoát</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rankButton} onPress={modalRank}>
-                        <Icon name="trophy" size={30} color="#ff0000" /> 
-                        <Text style={styles.titleRankButton}>Xếp Hạng</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
             <StatusBar hidden={true} />
             <Start />
@@ -803,11 +765,42 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        // backgroundColor: '#00ffbf'
+    },
+    backgroundGame: {
+        height: 540,
+        width: 960,
+        position:'relative'
+    },
+    clockCountDown: {
+        width: 130,
+        height: 60,
+        borderRadius: 15,
+        backgroundColor: '#ffffff',
+        marginTop: 40,
+        marginLeft: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    hourGlass: {
+        height: 35,
+        width: 35,
+        marginLeft: 10
+    },
+    pointGame: {
+        width: 90,
+        height: 60,
+        borderRadius: 15,
+        backgroundColor: '#ffffff',
+        marginTop: 40,
+        marginRight: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row'
     },
     backgroundQuest: {
         justifyContent: 'center',
-         backgroundColor: '#00ffbf'
+        backgroundColor: '#00ffbf'
     },
     quest: {
         marginTop: 5,
@@ -816,17 +809,16 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     answer: {
-        marginTop: -10,
         justifyContent: 'center',
         alignItems: 'center',
     },
     answerButton: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: '16%',
+        height: '15%',
         width: '80%',
         backgroundColor: '#66ccff',
-        marginBottom: '3%',
+        marginBottom: '5%',
         borderRadius: 10
     },
     answerText:{
@@ -839,7 +831,7 @@ const styles = StyleSheet.create({
         height: '10%',
         marginLeft: 10,
         marginRight: 10,
-        bottom: 15,
+        bottom: 50,
     },
     quitButton: {
         backgroundColor: '#ff0000',
@@ -902,7 +894,8 @@ const styles = StyleSheet.create({
     },
     textBackButton: {
         color: '#000000',
-        fontSize: 26
+        fontSize: 26,
+        fontWeight: 'bold'
     },
     modalResult: {
         height: '45%',
@@ -940,4 +933,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default App;
+export default QuestGameScreen;
