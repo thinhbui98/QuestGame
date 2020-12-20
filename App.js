@@ -6,21 +6,17 @@ import {
     StyleSheet,
     View,
     Text,
-    StatusBar,
     Platform,
     TouchableOpacity,
     VirtualizedList,
     Dimensions,
     LogBox
 } from 'react-native';
-import { Root, Overlay } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Overlay } from 'react-native-elements';
 import CountDown from 'react-native-countdown-component';
-import NavigationService from '../../Navigation';
-import Routes from '../../Navigation/Routes';
-import {ButtonX} from '../../Components';
 import { ACCESS_TOKEN,HTTP_CODE } from '../../Constants';
-import ENV from '../../Config';
+import { useStoreState, useStoreActions } from 'easy-peasy';
+import { shuffleArray } from '../../Utils/ArrayUtils';
 
 const rank = [
     {
@@ -69,8 +65,6 @@ const rank = [
         score: 9
     }
 ];
-
-// const rank = [];
 
 const data = [
     {
@@ -193,6 +187,26 @@ const data = [
         'question': 'Ho là kí tự nào dưới đây?',
         'answer': 'ほ'
     },
+    {
+        'question': 'Ma là kí tự nào dưới đây?',
+        'answer': 'ま'
+    },
+    {
+        'question': 'Mi là kí tự nào dưới đây?',
+        'answer': 'み'
+    },
+    {
+        'question': 'Mu là kí tự nào dưới đây?',
+        'answer': 'む'
+    },
+    {
+        'question': 'Me là kí tự nào dưới đây?',
+        'answer': 'め'
+    },
+    {
+        'question': 'Mo là kí tự nào dưới đây?',
+        'answer': 'も'
+    },
 ].sort(() => Math.random() - 0.5);
 
 const hiragana = [
@@ -228,14 +242,10 @@ const hiragana = [
 LogBox.ignoreAllLogs();
 const windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,
-    DEFAULT_CHARATER_TOP_ANIMATED = 220,
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250,
+    DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250, //280
     TIME_DEFAULT = 10,
-    TIME_ANSWER = TIME_DEFAULT * data.length,
-    PARAMS = {
-        access_token:"ef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca1",
-        lesson_id:"1"
-    }
+    TIME_ANSWER = TIME_DEFAULT * data.length
 
 var tempCharaterLeftAnimated = 100,
     tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
@@ -248,27 +258,32 @@ var tempCharaterLeftAnimated = 100,
     questNum = 0,
     timeLeft = 0,
     timeCountDown = 0,
-    flagFirework = false
+    flagFirework = false,
+    dataRankGame = {};
 
 const QuestGameScreen = ({route, navigation}) => {
-    const { title, lesson_id } = route.params;
-    React.useLayoutEffect(() => {
-        navigation.setOptions({
-            title: title,
-            headerRight :  () => (<ButtonX
-                onPress={modalRank}
-                tKey={'Xếp Hạng'}
-                style={{
-                    height: 40,
-                    width: 120,
-                    backgroundColor : '#ff0000'
-                }}
-            />),
-            // headerLeft : () =>(
-            //     <Text>123123</Text>
-            // )
-        });
-    }, [navigation]);
+    const { getRankGame } = useStoreActions((actions) => ({
+        getRankGame: actions.game.getRankGame
+    })),
+        { title, lesson_id, lesson_data } = route.params,
+        PARAMS = {
+            access_token: ACCESS_TOKEN,
+            lesson_id: lesson_id
+        }
+
+    const processLessonData = (data) => {
+        let listAnswer = [];
+        for (let index = 0; index < data.length; index++) {
+            if (data[index].title_jp != '-') {
+                listAnswer.push(data[index].title_jp);
+            }
+        }
+        return listAnswer;
+    }
+    const dataAnswer =  processLessonData(lesson_data);
+    console.log('testdata',hiragana.length);
+    
+    
     //state
     const [score, setScore] = useState(0),
         [visibleStartGame, setVisibleStartGame] = useState(true),
@@ -278,8 +293,9 @@ const QuestGameScreen = ({route, navigation}) => {
         [characterStatus, setcharacterStatus] = useState(false),
         [flagAnswer, setFlagAnswer] = useState(true),
         [clock, setClock] = useState(false),
-        [timeClock, setTimeClock] = useState(TIME_ANSWER),
+        // [timeClock, setTimeClock] = useState(TIME_ANSWER),
         [disableAnswer, setDisableAnswer] = useState(false),
+        // [dataRankGame, setDataRankGame] = useState({})
     //animated
     //trang thai dau tien
         charaterLeftAnimated = useRef(new Animated.Value(0)).current,
@@ -290,13 +306,24 @@ const QuestGameScreen = ({route, navigation}) => {
         questions = data[questNum].question,
         answer = [data[questNum].answer];
 
+        useLayoutEffect(() => {
+            navigation.setOptions({
+                title: title
+            });
+            // apiGetRankGame();
+        }, [navigation]);
+
+        useEffect(() => {
+            apiGetRankGame();
+        }, [])
+
     if (flagAnswer) {
         let i = 0, temp;
         while (i < 3) {
-            let rand = Math.floor(Math.random() * hiragana.length);
-            if(answer.indexOf(hiragana[rand]) == -1){
-                if(hiragana[rand] != answer[0] && rand != temp){
-                    answer.push(hiragana[rand]);
+            let rand = Math.floor(Math.random() * dataAnswer.length);
+            if(answer.indexOf(dataAnswer[rand]) == -1){
+                if(dataAnswer[rand] != answer[0] && rand != temp){
+                    answer.push(dataAnswer[rand]);
                     answer.sort(() => Math.random() - 0.5);
                     temp = rand;
                     i++;
@@ -318,9 +345,7 @@ const QuestGameScreen = ({route, navigation}) => {
     const chooseAnswer = (answer,index) => {
         setDisableAnswer(true);
         if (answer == data[questNum].answer) {
-            if (checkAnswer[index]) {
-                checkAnswer[index] = {backgroundColor: '#00cc00'};
-            }
+            checkAnswer[index] = {backgroundColor: '#00cc00'};
             trueAnswer = true;
             setClock(false);
             setScore(score + 1);
@@ -341,8 +366,8 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 5;
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 2.5;
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 18; // giam 2 thi duoc them 5 cau
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 9;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
                     duration: 1000, 
@@ -386,10 +411,11 @@ const QuestGameScreen = ({route, navigation}) => {
                                     break;
                                 default:
                                     console.log('case last');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                                     if (questNum < data.length - 1) {
+                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
+                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
                                         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+                                        tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                     }
                                     break;
                             }
@@ -463,8 +489,7 @@ const QuestGameScreen = ({route, navigation}) => {
             setClock(false);
             setDisableAnswer(false);
             setVisibleResult(!visibleResult);
-            setTimeClock(TIME_ANSWER);
-            
+            // setTimeClock(TIME_ANSWER);
         }
     }
 
@@ -477,6 +502,8 @@ const QuestGameScreen = ({route, navigation}) => {
         movingBackground = 0;
         tempCharaterLeftAnimated = 100;
         tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED;
+        tempBackgroundRightAnimated = 0,
+        tempBackgroundBottomAnimated = 0,
         setScore(0);
         setClock(true);
         setFlagAnswer(true);
@@ -518,30 +545,51 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const modalRank = () => {
         setVisibleRank(!visibleRank);
-        setClock(!clock);
+        setVisibleResult(!visibleResult);
+        // setClock(!clock);
+        // if (clock) {
+        //     setClock(true);
+        // } else {
+        //     setClock(false);
+        // }
     };
 
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
         setClock(true);
-        setTimeClock(TIME_ANSWER);
+        // setTimeClock(TIME_ANSWER);
         timeLeft = TIME_ANSWER;
     }
 
     const onFinishTime = () => {
         setClock(false);
-        setTimeClock(TIME_ANSWER);
+        // setTimeClock(TIME_ANSWER);
         setVisibleResult(!visibleResult);
     }
 
     const onChangeTime = () => {
-        timeLeft = timeLeft - 1;
-        console.log('timeLeft',timeLeft);
+        if (timeLeft > 0) {
+            timeLeft = timeLeft - 1;
+        }
+    }
+
+    const apiGetRankGame = async () => {
+        const { code, message, data } = await getRankGame(PARAMS);
+        console.log('code',code);
+        if(code == HTTP_CODE.CODE_201 || code == HTTP_CODE.CODE_401){
+            toastRef.current.showAlert({
+                content : message, 
+                isSuccess : false
+            });
+        }else{
+            // setDataRankGame(data);
+            dataRankGame = data.top10;
+        }
     }
 
     const Start = () => {
-        // callApi(URL_GETRANKGAME,params);
+        console.log('top',dataRankGame);
         const Item = ({ item, index })=> {
             let medal = '';
             switch (index) {
@@ -556,15 +604,13 @@ const QuestGameScreen = ({route, navigation}) => {
                     break;
             }
             return (
-                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 60}}>
-                    <View style={{flexDirection:'row'}}>
-                        <View style={{justifyContent:'center'}}>
-                            <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
-                        </View>
-                        <View style={{justifyContent:'center',marginLeft:15}}>
-                            <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
-                            <Text style={{fontSize: 16}}>{item.class}</Text>
-                        </View>
+                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15,flexDirection:'row', marginBottom: 15,height: 60}}>
+                    <View style={{justifyContent:'center'}}>
+                        <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
+                    </View>
+                    <View style={{justifyContent:'center',marginLeft:15}}>
+                        <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
+                        <Text style={{fontSize: 16}}>{item.class}</Text>
                     </View>
                 </View>
             );
@@ -574,9 +620,9 @@ const QuestGameScreen = ({route, navigation}) => {
                 <View style={styles.headerStartButton}>
                     <Text style={styles.textHeaderStartButton}>Top Rank</Text>
                 </View>
-                {rank.length > 0 ? (
+                {dataRankGame.length > 0 ? (
                     <VirtualizedList
-                        data={rank}
+                        data={dataRankGame}
                         renderItem={({ item, index }) => <Item item={item} index={index} />}
                         keyExtractor={ ( item,index ) => index.toString() }
                         getItemCount={(data) => {return 3}}
@@ -600,7 +646,6 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const Result = () => {
         // callApi(URL_SETSCORE)
-        
         return(
             <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={styles.modalResult}>
                 <View style={styles.headerResult}>
@@ -609,6 +654,9 @@ const QuestGameScreen = ({route, navigation}) => {
                 <View style={styles.bodyResult}>
                     <Text style={styles.scoreResult}>{score}</Text>
                     {/* <Text style={{fontSize:18}}>You answer correctly {score} / {data.length}</Text> */}
+                    <TouchableOpacity onPress={modalRank} style={{backgroundColor:'#00ffbf', height:40, justifyContent:'center', width:'60%', borderRadius:10}}>
+                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Xếp hạng</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={{flexDirection: 'row',justifyContent:'space-around',height:'20%'}}>
                     <TouchableOpacity onPress={playAgain} style={{backgroundColor:'#66b3ff', height:40, justifyContent:'center', width:'40%', borderRadius:10}}>
@@ -622,30 +670,7 @@ const QuestGameScreen = ({route, navigation}) => {
         );
     }
 
-    const TimeCountDown = () => {
-        timeCountDown = timeClock;
-        if (trueAnswer) {
-            timeCountDown = timeLeft;
-        }
-        return(
-            <CountDown
-                until={timeCountDown}
-                size={25}
-                onFinish={onFinishTime}
-                onChange={onChangeTime}
-                timeToShow={['M','S']}
-                timeLabels={{m: null, s: null}}
-                digitStyle={{backgroundColor: 'none', marginLeft:-10}}
-                running={clock}
-                digitTxtStyle={{color: '#cc5c00'}}
-                separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
-                showSeparator
-            />
-        )
-    }
-
     const Rank = () => {
-        // callApi(URL_GETRANKGAME,params);
         const Item = ({ item, index })=> {
             let medal = '';
             switch (index) {
@@ -684,13 +709,13 @@ const QuestGameScreen = ({route, navigation}) => {
             );
         }
         return(
-            <Overlay animationType={'fade'} isVisible={visibleRank} onBackdropPress={modalRank} overlayStyle={styles.modalRank}>
+            <Overlay animationType={'fade'} isVisible={visibleRank} overlayStyle={styles.modalRank}>
                 <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
                     <Text style={{fontSize:30,fontWeight:'bold'}}>Top Rank</Text>
                 </View>
-                {rank.length > 0 ? (
+                {dataRankGame.length > 0 ? (
                     <VirtualizedList
-                        data={rank}
+                        data={dataRankGame}
                         renderItem={({ item, index }) => <Item item={item} index={index} />}
                         keyExtractor={ ( item,index ) => index.toString() }
                         getItemCount={(data) => {return data.length}}
@@ -704,38 +729,60 @@ const QuestGameScreen = ({route, navigation}) => {
                 )}
                 <View style={{justifyContent:'center',height:'10%'}}>
                     <TouchableOpacity onPress={modalRank} style={{justifyContent:'center',height:'60%',width:'50%',backgroundColor:'#ff0000',alignSelf:'center',borderRadius:5}}>
-                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Close</Text>
+                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Đóng</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
         );
     }
 
+    const TimeCountDown = () => {
+        timeCountDown = TIME_ANSWER;
+        if (trueAnswer) {
+            timeCountDown = timeLeft;
+        }
+        return(
+            <CountDown
+                until={timeCountDown}
+                size={25}
+                onFinish={onFinishTime}
+                onChange={onChangeTime}
+                timeToShow={['M','S']}
+                timeLabels={{m: null, s: null}}
+                digitStyle={{backgroundColor: 'none', marginLeft:-10}}
+                running={clock}
+                digitTxtStyle={{color: '#cc5c00'}}
+                separatorStyle={{color: '#cc5c00',marginLeft:-10,marginTop:-5}}
+                showSeparator
+            />
+        )
+    }
+
     return (
         <View style={styles.background}>
             <View style={{ height: windowWidth * 0.7}}>
-                <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame,{bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
+                <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
                 <View style={{top: Platform.OS == 'ios' ? -550 : -560,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={styles.clockCountDown}>
                         <Image source={require('../../Assets/game/hourglass.gif')} style={styles.hourGlass} />
                         <TimeCountDown />
                     </View>
                     <View style={styles.pointGame}>
-                        <Image source={require('../../Assets/game/star.gif')} style={{height:40,width:40}} />
-                        <Text style={{fontSize: 25, fontWeight:'bold',color:'#ffcc00'}}>{score < 10 ? '0'+score : score }</Text>
+                        <Image source={require('../../Assets/game/star.gif')} style={styles.pointStar} />
+                        <Text style={styles.pointText}>{score < 10 ? '0' + score : score }</Text>
                     </View>
                 </View>
-                <Animated.Image source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} />
+                <Animated.Image source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')} style={[styles.character, {top:charaterTopAnimated,left: charaterLeftAnimated}]} />
                 {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
                 {flagFirework ? (
-                    <Animated.Image source={require('../../Assets/game/firework.gif')} style={{height: 100, width: 100, top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated, position:'absolute'}} />
+                    <Animated.Image source={require('../../Assets/game/firework.gif')} style={[styles.firework, {top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated}]} />
                 ) : (
                     <View></View>
                 )}
             </View>
             <View style={[styles.backgroundQuest, {height: windowHeight - (windowWidth * 0.9)}]}>
                 <ImageBackground source={require('../../Assets/game//hexagon.png')} style={[styles.quest,{height: '16%'}]}>
-                    <Text style={{fontSize: 20,fontWeight:'bold',color:'white'}}>{questions}</Text>
+                    <Text style={styles.questText}>{questions}</Text>
                 </ImageBackground>
                 <View style={styles.answer}>
                     <TouchableOpacity style={[styles.answerButton, checkAnswer[0]]} disabled={disableAnswer} onPress={() => chooseAnswer(renderAnwser[0],0)}>
@@ -752,10 +799,14 @@ const QuestGameScreen = ({route, navigation}) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <StatusBar hidden={true} />
             <Start />
             <Result />
-            <Rank />
+            {visibleRank ? (
+                <Rank />
+            ) : (
+                <View></View>
+            )}
+            
         </View>
     );
 };
@@ -787,6 +838,10 @@ const styles = StyleSheet.create({
         width: 35,
         marginLeft: 10
     },
+    pointStar: {
+        height: 40,
+        width: 40
+    },
     pointGame: {
         width: 90,
         height: 60,
@@ -798,6 +853,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row'
     },
+    pointText: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        color: '#ffcc00'
+    },
+    character: {
+        height: 70,
+        width: 36,
+        position: 'absolute'
+    },
+    firework: {
+        height: 100,
+        width: 100,
+        position:'absolute'
+    },
     backgroundQuest: {
         justifyContent: 'center',
         backgroundColor: '#00ffbf'
@@ -807,6 +877,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%'
+    },
+    questText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white'
     },
     answer: {
         justifyContent: 'center',
@@ -894,7 +969,7 @@ const styles = StyleSheet.create({
     },
     textBackButton: {
         color: '#000000',
-        fontSize: 26,
+        fontSize: 22,
         fontWeight: 'bold'
     },
     modalResult: {
