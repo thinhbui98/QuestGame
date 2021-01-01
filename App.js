@@ -10,13 +10,16 @@ import {
     TouchableOpacity,
     VirtualizedList,
     Dimensions,
-    LogBox
+    LogBox,
+    Button
 } from 'react-native';
 import { Overlay } from 'react-native-elements';
 import CountDown from 'react-native-countdown-component';
 import { ACCESS_TOKEN,HTTP_CODE } from '../../Constants';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { shuffleArray } from '../../Utils/ArrayUtils';
+import Icon from 'react-native-vector-icons/FontAwesome';
+Icon.loadFont();
 
 const rank = [
     {
@@ -66,204 +69,32 @@ const rank = [
     }
 ];
 
-const data = [
-    {
-        'question': 'A là kí tự nào dưới đây?',
-        'answer': 'あ'
-    },
-    {
-        'question': 'I là kí tự nào dưới đây?',
-        'answer': 'い'
-    },
-    {
-        'question': 'U là kí tự nào dưới đây?',
-        'answer': 'う'
-    },
-    {
-        'question': 'E là kí tự nào dưới đây?',
-        'answer': 'え'
-    },
-    {
-        'question': 'O là kí tự nào dưới đây?',
-        'answer': 'お'
-    },
-    {
-        'question': 'Ka là kí tự nào dưới đây?',
-        'answer': 'か'
-    },
-    {
-        'question': 'Ki là kí tự nào dưới đây?',
-        'answer': 'き'
-    },
-    {
-        'question': 'Ku là kí tự nào dưới đây?',
-        'answer': 'く'
-    },
-    {
-        'question': 'Ke là kí tự nào dưới đây?',
-        'answer': 'け'
-    },
-    {
-        'question': 'Ko là kí tự nào dưới đây?',
-        'answer': 'こ'
-    },
-    {
-        'question': 'Sa là kí tự nào dưới đây?',
-        'answer': 'さ'
-    },
-    {
-        'question': 'Shi là kí tự nào dưới đây?',
-        'answer': 'し'
-    },
-    {
-        'question': 'Su là kí tự nào dưới đây?',
-        'answer': 'す'
-    },
-    {
-        'question': 'Se là kí tự nào dưới đây?',
-        'answer': 'せ'
-    },
-    {
-        'question': 'So là kí tự nào dưới đây?',
-        'answer': 'そ'
-    },
-    {
-        'question': 'Ta là kí tự nào dưới đây?',
-        'answer': 'た'
-    },
-    {
-        'question': 'Chi là kí tự nào dưới đây?',
-        'answer': 'ち'
-    },
-    {
-        'question': 'Tsu là kí tự nào dưới đây?',
-        'answer': 'つ'
-    },
-    {
-        'question': 'Te là kí tự nào dưới đây?',
-        'answer': 'て'
-    },
-    {
-        'question': 'To là kí tự nào dưới đây?',
-        'answer': 'と'
-    },
-    {
-        'question': 'Na là kí tự nào dưới đây?',
-        'answer': 'な'
-    },
-    {
-        'question': 'Ni là kí tự nào dưới đây?',
-        'answer': 'に'
-    },
-    {
-        'question': 'Nu là kí tự nào dưới đây?',
-        'answer': 'ぬ'
-    },
-    {
-        'question': 'Ne là kí tự nào dưới đây?',
-        'answer': 'ね'
-    },
-    {
-        'question': 'No là kí tự nào dưới đây?',
-        'answer': 'の'
-    },
-    {
-        'question': 'Ha là kí tự nào dưới đây?',
-        'answer': 'は'
-    },
-    {
-        'question': 'Hi là kí tự nào dưới đây?',
-        'answer': 'ひ'
-    },
-    {
-        'question': 'Fu là kí tự nào dưới đây?',
-        'answer': 'ふ'
-    },
-    {
-        'question': 'He là kí tự nào dưới đây?',
-        'answer': 'へ'
-    },
-    {
-        'question': 'Ho là kí tự nào dưới đây?',
-        'answer': 'ほ'
-    },
-    {
-        'question': 'Ma là kí tự nào dưới đây?',
-        'answer': 'ま'
-    },
-    {
-        'question': 'Mi là kí tự nào dưới đây?',
-        'answer': 'み'
-    },
-    {
-        'question': 'Mu là kí tự nào dưới đây?',
-        'answer': 'む'
-    },
-    {
-        'question': 'Me là kí tự nào dưới đây?',
-        'answer': 'め'
-    },
-    {
-        'question': 'Mo là kí tự nào dưới đây?',
-        'answer': 'も'
-    },
-].sort(() => Math.random() - 0.5);
-
-const hiragana = [
-    'あ', 'い', 'う', 'え', 'お',
-    'か', 'き', 'く', 'け', 'こ',
-    'さ', 'し', 'す', 'せ', 'そ',
-    'た', 'ち', 'つ', 'て', 'と',
-    'な', 'に', 'ぬ', 'ね', 'の',
-    'は', 'ひ', 'ふ', 'へ', 'ほ',
-    'ま', 'み', 'む', 'め', 'も',
-    'ら', 'り', 'る', 'れ', 'ろ',
-    'や', 'ゆ', 'よ',
-    'わ', 'を', 'ん',
-    'が', 'ぎ', 'ぐ', 'げ', 'ご',
-    'ざ', 'じ', 'ず', 'ぜ', 'ぞ',
-    'だ', 'ぢ', 'づ', 'で', 'ど',
-    'ば', 'び', 'ぶ', 'べ', 'ぼ',
-    'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ',
-    'きゃ', 'きゅ', 'きょ',
-    'しゃ', 'しゅ', 'しょ',
-    'ちゃ', 'ちゅ', 'ちょ',
-    'にゃ', 'にゅ', 'にょ',
-    'ひゃ', 'ひゅ', 'ひょ',
-    'みゃ', 'みゅ', 'みょ',
-    'りゃ', 'りゅ', 'りょ',
-    'ぎゃ', 'ぎゅ', 'ぎょ',
-    'じゃ', 'じゅ', 'じょ',
-    'ぢゃ', 'ぢゅ', 'ぢょ',
-    'びゃ', 'びゅ', 'びょ',
-    'ぴゃ', 'ぴゅ', 'ぴょ'
-];
-
 LogBox.ignoreAllLogs();
 const windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,
+    // DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
+    // DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250, //280
     DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250, //280
-    TIME_DEFAULT = 10,
-    TIME_ANSWER = TIME_DEFAULT * data.length
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 350, //280
+    TIME_ANSWER = 300
 
-var tempCharaterLeftAnimated = 100,
+var tempCharaterLeftAnimated = 140, //100
     tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
     movingBackground = 0,
     renderAnwser = [],
     checkAnswer = [],
-    trueAnswer = 0;
+    trueAnswer = 0,
     questNum = 0,
-    timeLeft = 0,
-    timeCountDown = 0,
     flagFirework = false,
     dataRankGame = {};
 
 const QuestGameScreen = ({route, navigation}) => {
-    const { getRankGame } = useStoreActions((actions) => ({
-        getRankGame: actions.game.getRankGame
+
+    const { getRankGame, setResultGame } = useStoreActions((actions) => ({
+        getRankGame: actions.game.getRankGame,
+        setResultGame: actions.game.setResultGame
     })),
         { title, lesson_id, lesson_data } = route.params,
         PARAMS = {
@@ -271,7 +102,7 @@ const QuestGameScreen = ({route, navigation}) => {
             lesson_id: lesson_id
         }
 
-    const processLessonData = (data) => {
+    const processAnswerData = (data) => {
         let listAnswer = [];
         for (let index = 0; index < data.length; index++) {
             if (data[index].title_jp != '-') {
@@ -280,10 +111,25 @@ const QuestGameScreen = ({route, navigation}) => {
         }
         return listAnswer;
     }
-    const dataAnswer =  processLessonData(lesson_data);
-    console.log('testdata',hiragana.length);
+
+    const processQuestionData = (data) => {
+        let listQuestion = [];
+        for (let index = 0; index < data.length; index++) {
+            if (data[index].title_vn != '-') {
+                listQuestion.push({
+                    question: data[index].title_vn,
+                    answer: data[index].title_jp
+                });
+            }
+        }
+        return listQuestion;
+        // return shuffleArray(listQuestion);
+    }
     
-    
+    const dataAnswer =  processAnswerData(lesson_data);
+
+    const dataQuestion = processQuestionData(lesson_data);
+
     //state
     const [score, setScore] = useState(0),
         [visibleStartGame, setVisibleStartGame] = useState(true),
@@ -293,9 +139,8 @@ const QuestGameScreen = ({route, navigation}) => {
         [characterStatus, setcharacterStatus] = useState(false),
         [flagAnswer, setFlagAnswer] = useState(true),
         [clock, setClock] = useState(false),
-        // [timeClock, setTimeClock] = useState(TIME_ANSWER),
-        [disableAnswer, setDisableAnswer] = useState(false),
-        // [dataRankGame, setDataRankGame] = useState({})
+        [timeClock, setTimeClock] = useState(TIME_ANSWER),
+        [disableAnswer, setDisableAnswer] = useState(false)
     //animated
     //trang thai dau tien
         charaterLeftAnimated = useRef(new Animated.Value(0)).current,
@@ -303,14 +148,26 @@ const QuestGameScreen = ({route, navigation}) => {
         backgroundRightAnimated = useRef(new Animated.Value(0)).current,
         backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current,
     //render cau hoi va cau tra loi
-        questions = data[questNum].question,
-        answer = [data[questNum].answer];
+        questions = dataQuestion[questNum].question,
+        answer = [dataQuestion[questNum].answer];
+        
 
         useLayoutEffect(() => {
             navigation.setOptions({
-                title: title
+                title: title,
+                // headerLeft: () => (
+                //     <Icon name='chevron-left' />
+                // )
+                headerRight :  () => (<ButtonX
+                    onPress={() => modalRank()}
+                    tKey={'Xếp hạng'}
+                    style={{
+                        height: 40,
+                        width: 120,
+                        backgroundColor : '#d40000'
+                    }}
+                />)
             });
-            // apiGetRankGame();
         }, [navigation]);
 
         useEffect(() => {
@@ -330,8 +187,10 @@ const QuestGameScreen = ({route, navigation}) => {
                 }
             }
         }
+        // console.log('answer123123ư',answer);
+        console.log('questNum',questNum);
         for (let j = 0; j < answer.length; j++) {
-            if (answer[j] == data[questNum].answer) {
+            if (answer[j] == dataQuestion[questNum].answer) {
                 checkAnswer[j] = true;
             } else {
                 checkAnswer[j] = false;
@@ -344,7 +203,7 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const chooseAnswer = (answer,index) => {
         setDisableAnswer(true);
-        if (answer == data[questNum].answer) {
+        if (answer == dataQuestion[questNum].answer) {
             checkAnswer[index] = {backgroundColor: '#00cc00'};
             trueAnswer = true;
             setClock(false);
@@ -353,7 +212,7 @@ const QuestGameScreen = ({route, navigation}) => {
             if (score < 1) {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
-                    toValue: windowWidth/4,
+                    toValue: windowWidth/3,
                     duration: 2000,
                 }).start(( {finished} ) => {
                     if (finished) {
@@ -366,8 +225,8 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 18; // giam 2 thi duoc them 5 cau
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 9;
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 16; // giam 2 thi duoc them 5 cau
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 8;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
                     duration: 1000, 
@@ -390,28 +249,28 @@ const QuestGameScreen = ({route, navigation}) => {
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 100;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 50;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 80;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 200;
+                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
                                     break;
                                 case 2:
                                     console.log('case2');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 60;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                     break;
                                 case 3:
                                     console.log('case3');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 130;
+                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                     break;
                                 default:
                                     console.log('case last');
-                                    if (questNum < data.length - 1) {
+                                    if (questNum < dataQuestion.length - 1) {
                                         tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
                                         tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
                                         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
@@ -455,7 +314,7 @@ const QuestGameScreen = ({route, navigation}) => {
                             }).start(( {finished} ) => {
                                 if (finished) {
                                     console.log('tempCharaterTopAnimated3 stop')
-                                    if (questNum == data.length - 1) {
+                                    if (questNum == dataQuestion.length - 1) {
                                         flagFirework = true;
                                         setVisibleResult(!visibleResult);
                                         setClock(false);
@@ -468,7 +327,7 @@ const QuestGameScreen = ({route, navigation}) => {
                                 }
                             });
                         } else {
-                            if (questNum == data.length - 1) {
+                            if (questNum == dataQuestion.length - 1) {
                                 flagFirework = true;
                                 setVisibleResult(!visibleResult);
                                 setClock(false);
@@ -489,18 +348,15 @@ const QuestGameScreen = ({route, navigation}) => {
             setClock(false);
             setDisableAnswer(false);
             setVisibleResult(!visibleResult);
-            // setTimeClock(TIME_ANSWER);
         }
     }
 
     const playAgain = () => {
-        data.sort(() => Math.random() - 0.5);
-        timeLeft = TIME_ANSWER;
         questNum = 0;
         checkAnswer = [];
         flagFirework = false;
         movingBackground = 0;
-        tempCharaterLeftAnimated = 100;
+        tempCharaterLeftAnimated = 140;
         tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED;
         tempBackgroundRightAnimated = 0,
         tempBackgroundBottomAnimated = 0,
@@ -534,7 +390,6 @@ const QuestGameScreen = ({route, navigation}) => {
         if (visibleResult) {
             setVisibleResult(!visibleResult);
         }
-        data.sort(() => Math.random() - 0.5);
         navigation.goBack();
     }
 
@@ -546,44 +401,31 @@ const QuestGameScreen = ({route, navigation}) => {
     const modalRank = () => {
         setVisibleRank(!visibleRank);
         setVisibleResult(!visibleResult);
-        // setClock(!clock);
-        // if (clock) {
-        //     setClock(true);
-        // } else {
-        //     setClock(false);
-        // }
     };
 
     const startGame = () => {
         setVisibleStartGame(!visibleStartGame);
         setvisibleQuest(!visibleQuest);
         setClock(true);
-        // setTimeClock(TIME_ANSWER);
-        timeLeft = TIME_ANSWER;
     }
 
     const onFinishTime = () => {
         setClock(false);
-        // setTimeClock(TIME_ANSWER);
         setVisibleResult(!visibleResult);
     }
 
     const onChangeTime = () => {
-        if (timeLeft > 0) {
-            timeLeft = timeLeft - 1;
-        }
+        console.log('onChangeTime run');
     }
 
     const apiGetRankGame = async () => {
         const { code, message, data } = await getRankGame(PARAMS);
-        console.log('code',code);
-        if(code == HTTP_CODE.CODE_201 || code == HTTP_CODE.CODE_401){
+        if (code == HTTP_CODE.CODE_201 || code == HTTP_CODE.CODE_401) {
             toastRef.current.showAlert({
                 content : message, 
                 isSuccess : false
             });
-        }else{
-            // setDataRankGame(data);
+        } else {
             dataRankGame = data.top10;
         }
     }
@@ -645,7 +487,6 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Result = () => {
-        // callApi(URL_SETSCORE)
         return(
             <Overlay isVisible={visibleResult} animationType={'fade'} overlayStyle={styles.modalResult}>
                 <View style={styles.headerResult}>
@@ -737,18 +578,14 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const TimeCountDown = () => {
-        timeCountDown = TIME_ANSWER;
-        if (trueAnswer) {
-            timeCountDown = timeLeft;
-        }
         return(
             <CountDown
-                until={timeCountDown}
+                until={timeClock}
                 size={25}
                 onFinish={onFinishTime}
                 onChange={onChangeTime}
-                timeToShow={['M','S']}
-                timeLabels={{m: null, s: null}}
+                timeToShow={['S']}
+                timeLabels={{s: null}}
                 digitStyle={{backgroundColor: 'none', marginLeft:-10}}
                 running={clock}
                 digitTxtStyle={{color: '#cc5c00'}}
@@ -758,11 +595,17 @@ const QuestGameScreen = ({route, navigation}) => {
         )
     }
 
+    const Rock = () => {
+        return(
+            <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: tempCharaterTopAnimated + 40 ,left: tempCharaterLeftAnimated + 30}]} />    
+        )
+    }
+
     return (
         <View style={styles.background}>
             <View style={{ height: windowWidth * 0.7}}>
                 <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
-                <View style={{top: Platform.OS == 'ios' ? -550 : -560,flexDirection: 'row',justifyContent: 'space-between'}}>
+                <View style={{top: Platform.OS == 'ios' ? -650 : -640,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={styles.clockCountDown}>
                         <Image source={require('../../Assets/game/hourglass.gif')} style={styles.hourGlass} />
                         <TimeCountDown />
@@ -779,6 +622,7 @@ const QuestGameScreen = ({route, navigation}) => {
                 ) : (
                     <View></View>
                 )}
+                <Rock />
             </View>
             <View style={[styles.backgroundQuest, {height: windowHeight - (windowWidth * 0.9)}]}>
                 <ImageBackground source={require('../../Assets/game//hexagon.png')} style={[styles.quest,{height: '16%'}]}>
@@ -801,12 +645,7 @@ const QuestGameScreen = ({route, navigation}) => {
             </View>
             <Start />
             <Result />
-            {visibleRank ? (
-                <Rank />
-            ) : (
-                <View></View>
-            )}
-            
+            <Rank />
         </View>
     );
 };
@@ -818,12 +657,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     backgroundGame: {
-        height: 540,
-        width: 960,
+        // height: 540,
+        // width: 960,
+        height: 648,
+        width: 1152,
         position:'relative'
     },
     clockCountDown: {
-        width: 130,
+        width: 90,
         height: 60,
         borderRadius: 15,
         backgroundColor: '#ffffff',
@@ -866,6 +707,11 @@ const styles = StyleSheet.create({
     firework: {
         height: 100,
         width: 100,
+        position:'absolute'
+    },
+    rock: {
+        height: 30,
+        width: 30,
         position:'absolute'
     },
     backgroundQuest: {
