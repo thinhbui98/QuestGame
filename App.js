@@ -19,7 +19,7 @@ import { ACCESS_TOKEN,HTTP_CODE } from '../../Constants';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { shuffleArray } from '../../Utils/ArrayUtils';
 import Icon from 'react-native-vector-icons/FontAwesome';
-Icon.loadFont();
+// Icon.loadFont();
 
 const rank = [
     {
@@ -155,18 +155,11 @@ const QuestGameScreen = ({route, navigation}) => {
         useLayoutEffect(() => {
             navigation.setOptions({
                 title: title,
-                // headerLeft: () => (
-                //     <Icon name='chevron-left' />
-                // )
-                headerRight :  () => (<ButtonX
-                    onPress={() => modalRank()}
-                    tKey={'Xếp hạng'}
-                    style={{
-                        height: 40,
-                        width: 120,
-                        backgroundColor : '#d40000'
-                    }}
-                />)
+                headerLeft :  () => (
+                    <TouchableOpacity onPress={quitGame}>
+                        <Icon name={'chevron-left'} color={'#ffffff'} size={28} />
+                    </TouchableOpacity>
+                )
             });
         }, [navigation]);
 
@@ -225,8 +218,8 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 16; // giam 2 thi duoc them 5 cau
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 8;
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 14; // giam 2 thi duoc them 5 cau
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 7;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
                     duration: 1000, 
@@ -249,7 +242,7 @@ const QuestGameScreen = ({route, navigation}) => {
                             switch (movingBackground) {
                                 case 1:
                                     console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 80;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
@@ -263,7 +256,7 @@ const QuestGameScreen = ({route, navigation}) => {
                                     break;
                                 case 3:
                                     console.log('case3');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 130;
+                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 120;
                                     tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                     tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
                                     tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
@@ -351,7 +344,7 @@ const QuestGameScreen = ({route, navigation}) => {
         }
     }
 
-    const playAgain = () => {
+    const resetGame = () => {
         questNum = 0;
         checkAnswer = [];
         flagFirework = false;
@@ -364,7 +357,9 @@ const QuestGameScreen = ({route, navigation}) => {
         setClock(true);
         setFlagAnswer(true);
         setDisableAnswer(false);
-        setVisibleResult(!visibleResult);
+        if (visibleResult) {
+            setVisibleResult(!visibleResult);
+        }
         Animated.timing(charaterLeftAnimated, {
             toValue: 0,
             duration: 0,
@@ -386,10 +381,15 @@ const QuestGameScreen = ({route, navigation}) => {
         }).start();
     }
 
+    const playAgain = () => {
+        resetGame();
+    }
+
     const quitGame = () => {
         if (visibleResult) {
             setVisibleResult(!visibleResult);
         }
+        resetGame();
         navigation.goBack();
     }
 
@@ -430,8 +430,19 @@ const QuestGameScreen = ({route, navigation}) => {
         }
     }
 
+    const apiSetResultGame = async () => {
+        const { code, message, data } = await setResultGame(PARAMS);
+        if (code == HTTP_CODE.CODE_201 || code == HTTP_CODE.CODE_401) {
+            toastRef.current.showAlert({
+                content : message, 
+                isSuccess : false
+            });
+        } else {
+            dataRankGame = data.top10;
+        }
+    }
+
     const Start = () => {
-        console.log('top',dataRankGame);
         const Item = ({ item, index })=> {
             let medal = '';
             switch (index) {
@@ -446,12 +457,12 @@ const QuestGameScreen = ({route, navigation}) => {
                     break;
             }
             return (
-                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15,flexDirection:'row', marginBottom: 15,height: 60}}>
+                <View style={[styles.itemStart ,{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff'}]}>
                     <View style={{justifyContent:'center'}}>
-                        <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
+                        <Image source={medal} style={styles.medalStart}/>
                     </View>
                     <View style={{justifyContent:'center',marginLeft:15}}>
-                        <Text style={{fontSize: 20,fontWeight:'bold'}}>{item.name}</Text>
+                        <Text style={{fontSize: 20,fontWeight: 'bold'}}>{item.name}</Text>
                         <Text style={{fontSize: 16}}>{item.class}</Text>
                     </View>
                 </View>
@@ -472,8 +483,8 @@ const QuestGameScreen = ({route, navigation}) => {
                     />
                 ) : (
                     <View style={{alignItems:'center',height:'55%'}}>
-                        <Image source={require('../../Assets/game/no_player.png')} style={{height: 170, width: 170}}/>
-                        <Text style={{fontSize: 20, fontWeight: 'bold'}}>Chưa có người chơi</Text>
+                        <Image source={require('../../Assets/game/no_player.png')} style={styles.noPlayerImg}/>
+                        <Text style={styles.noPlayerText}>Chưa có người chơi</Text>
                     </View>
                 )}
                 <TouchableOpacity style={styles.startButton} onPress={startGame}>
@@ -494,17 +505,16 @@ const QuestGameScreen = ({route, navigation}) => {
                 </View>
                 <View style={styles.bodyResult}>
                     <Text style={styles.scoreResult}>{score}</Text>
-                    {/* <Text style={{fontSize:18}}>You answer correctly {score} / {data.length}</Text> */}
-                    <TouchableOpacity onPress={modalRank} style={{backgroundColor:'#00ffbf', height:40, justifyContent:'center', width:'60%', borderRadius:10}}>
-                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Xếp hạng</Text>
+                    <TouchableOpacity onPress={modalRank} style={styles.rankResultButton}>
+                        <Text style={styles.rankResultText}>Xếp hạng</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{flexDirection: 'row',justifyContent:'space-around',height:'20%'}}>
-                    <TouchableOpacity onPress={playAgain} style={{backgroundColor:'#66b3ff', height:40, justifyContent:'center', width:'40%', borderRadius:10}}>
-                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Chơi Lại</Text>
+                <View style={styles.footerResult}>
+                    <TouchableOpacity onPress={playAgain} style={styles.playAgainButton}>
+                        <Text style={styles.playAgainText}>Chơi Lại</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={quitGame} style={{backgroundColor:'#ff0000', height:40, justifyContent:'center', width:'40%', borderRadius: 10}}>
-                        <Text style={{alignSelf:'center',color:'#ffffff',fontWeight:'bold',fontSize:16}}>Thoát</Text>
+                    <TouchableOpacity onPress={quitGame} style={styles.quitGameButton}>
+                        <Text style={styles.quitGameText}>Thoát</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
@@ -526,15 +536,15 @@ const QuestGameScreen = ({route, navigation}) => {
                     break;
             }
             return (
-                <View style={{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff', borderRadius: 15, justifyContent:'space-between',flexDirection:'row', marginBottom: 15,height: 70}}>
+                <View style={[styles.itemRank ,{backgroundColor: index % 2 == 0 ? '#ccfff5' : '#ffffff'}]}>
                     <View style={{flexDirection:'row'}}>
                         {medal != '' ? (
                             <View style={{justifyContent:'center'}}>
-                                <Image source={medal} style={{height:51,width:39,marginLeft:10}}/>
+                                <Image source={medal} style={styles.medalTop}/>
                             </View>
                         ) : (
                             <View style={{justifyContent:'center'}}>
-                                <Image source={require('../../Assets/game/medal_icon_04.png')} style={{height:45,width:36,marginLeft:10}}/>
+                                <Image source={require('../../Assets/game/medal_icon_04.png')} style={styles.medalNormal}/>
                             </View>
                         )}
                         <View style={{justifyContent:'center', marginLeft:15}}>
@@ -542,17 +552,17 @@ const QuestGameScreen = ({route, navigation}) => {
                             <Text style={{fontSize: 16}}>{item.class}</Text>
                         </View>
                     </View>
-                    <View style={{ marginRight:15, flexDirection:'row', alignItems:'center'}}>
-                        <Text style={{fontSize: 24,fontWeight:'bold', color: '#3333ff'}}> {item.score}</Text>
-                        <Image source={require('../../Assets/game/rank_star.png')} style={{height: 35,width: 35, marginLeft: 10}} />
+                    <View style={styles.itemPoint}>
+                        <Text style={styles.itemScore}>{item.score}</Text>
+                        <Image source={require('../../Assets/game/rank_star.png')} style={styles.starPoint} />
                     </View>
                 </View>
             );
         }
         return(
             <Overlay animationType={'fade'} isVisible={visibleRank} overlayStyle={styles.modalRank}>
-                <View style={{justifyContent:'center',alignItems:'center',height:'10%'}}>
-                    <Text style={{fontSize:30,fontWeight:'bold'}}>Top Rank</Text>
+                <View style={styles.headerRank}>
+                    <Text style={styles.headerRankText}>Top Rank</Text>
                 </View>
                 {dataRankGame.length > 0 ? (
                     <VirtualizedList
@@ -563,14 +573,14 @@ const QuestGameScreen = ({route, navigation}) => {
                         getItem={(data, index) => data[index]}
                     />
                 ) : (
-                    <View style={{alignItems:'center',height:'80%'}}>
-                        <Image source={require('../../Assets/game/no_player.png')} style={{height: 200, width: 200}}/>
+                    <View style={styles.bodyRank}>
+                        <Image source={require('../../Assets/game/no_player.png')} style={styles.noPlayerRankImg}/>
                         <Text style={{fontSize: 24, fontWeight: 'bold'}}>Chưa có người chơi</Text>
                     </View>
                 )}
-                <View style={{justifyContent:'center',height:'10%'}}>
-                    <TouchableOpacity onPress={modalRank} style={{justifyContent:'center',height:'60%',width:'50%',backgroundColor:'#ff0000',alignSelf:'center',borderRadius:5}}>
-                        <Text style={{alignSelf:'center',color: '#ffffff',fontSize:16,fontWeight:'bold'}}>Đóng</Text>
+                <View style={styles.footerRank}>
+                    <TouchableOpacity onPress={modalRank} style={styles.closeButton}>
+                        <Text style={styles.closeButtonText}>Đóng</Text>
                     </TouchableOpacity>
                 </View>
             </Overlay>
@@ -596,7 +606,7 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Rock = () => {
-        return(
+        return (
             <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: tempCharaterTopAnimated + 40 ,left: tempCharaterLeftAnimated + 30}]} />    
         )
     }
@@ -710,8 +720,8 @@ const styles = StyleSheet.create({
         position:'absolute'
     },
     rock: {
-        height: 30,
-        width: 30,
+        height: 25,
+        width: 25,
         position:'absolute'
     },
     backgroundQuest: {
@@ -768,6 +778,73 @@ const styles = StyleSheet.create({
         width: '95%',
         borderRadius: 15
     },
+    headerRank: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '10%'
+    },
+    headerRankText: {
+        fontSize: 30,
+        fontWeight: 'bold'
+    },
+    itemRank: {
+        borderRadius: 15,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginBottom: 15,
+        height: 70
+    },
+    medalTop: {
+        height: 51,
+        width: 39,
+        marginLeft: 10
+    },
+    medalNormal: {
+        height: 45,
+        width: 36,
+        marginLeft: 10
+    },
+    itemPoint: {
+        marginRight: 15,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    itemScore: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#3333ff'
+    },
+    starPoint: {
+        height: 35,
+        width: 35,
+        marginLeft: 10
+    },
+    bodyRank: {
+        alignItems: 'center',
+        height: '80%'
+    },
+    noPlayerRankImg: {
+        height: 200,
+        width: 200
+    },
+    footerRank: {
+        justifyContent: 'center'
+        ,height: '10%'
+    },
+    closeButton: {
+        justifyContent: 'center',
+        height: '60%',
+        width: '50%',
+        backgroundColor: '#ff0000',
+        alignSelf: 'center',
+        borderRadius: 5
+    },
+    closeButtonText: {
+        alignSelf: 'center',
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
     rankButton: {
         backgroundColor: 'white',
         flexDirection: 'row',
@@ -776,6 +853,17 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    itemStart: {
+        borderRadius: 15,
+        flexDirection: 'row',
+        marginBottom: 15,
+        height: 60
+    },
+    medalStart: {
+        height: 51,
+        width: 39,
+        marginLeft: 10
     },
     startButton: {
         backgroundColor: '#ff0000',
@@ -813,6 +901,14 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: 'bold'
     },
+    noPlayerImg: {
+        height: 170,
+        width: 170
+    },
+    noPlayerText: {
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
     textBackButton: {
         color: '#000000',
         fontSize: 22,
@@ -839,6 +935,50 @@ const styles = StyleSheet.create({
     scoreResult: {
         fontSize: 120, 
         color: '#ff0000'
+    },
+    rankResultButton: {
+        backgroundColor: '#00ffbf',
+        height: 40,
+        justifyContent: 'center',
+        width: '60%',
+        borderRadius: 10
+    },
+    rankResultText: {
+        alignSelf: 'center',
+        color: '#ffffff',
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    footerResult: {
+        flexDirection: 'row',
+        justifyContent:'space-around',
+        height: '20%'
+    },
+    playAgainButton: {
+        backgroundColor: '#66b3ff',
+        height: 40,
+        justifyContent: 'center',
+        width: '40%',
+        borderRadius: 10
+    },
+    playAgainText: {
+        alignSelf: 'center',
+        color: '#ffffff',
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    quitGameButton: {
+        backgroundColor: '#ff0000',
+        height: 40,
+        justifyContent: 'center',
+        width: '40%',
+        borderRadius: 10
+    },
+    quitGameText: {
+        alignSelf: 'center',
+        color: '#ffffff',
+        fontWeight: 'bold',
+        fontSize: 16
     },
     titleQuitButton: {
         color: '#ffffff',
