@@ -75,13 +75,15 @@ const windowWidth = Dimensions.get('window').width,
     // DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
     // DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250, //280
     DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
+    DEFAULT_CHARATER_LEFT_ANIMATED = 140,
     DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 350, //280
     TIME_ANSWER = 300
 
-var tempCharaterLeftAnimated = 140, //100
+var tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED, //100
     tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
+    firstStep = windowWidth/9,
     movingBackground = 0,
     renderAnwser = [],
     checkAnswer = [],
@@ -114,12 +116,18 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const processQuestionData = (data) => {
         let listQuestion = [];
+        // shuffleArray(data);
         for (let index = 0; index < data.length; index++) {
             if (data[index].title_vn != '-') {
-                listQuestion.push({
-                    question: data[index].title_vn,
-                    answer: data[index].title_jp
-                });
+                if (listQuestion.length < 30) {
+                    listQuestion.push({
+                        question: data[index].title_vn,
+                        answer: data[index].title_jp,
+                        index: index
+                    });
+                } else {
+                    break;
+                }
             }
         }
         return listQuestion;
@@ -202,15 +210,16 @@ const QuestGameScreen = ({route, navigation}) => {
             setClock(false);
             setScore(score + 1);
             setcharacterStatus(true);
-            if (score < 1) {
+            if (score < 3) {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
-                    toValue: windowWidth/3,
-                    duration: 2000,
+                    toValue: firstStep,
+                    duration: 1000,
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('charaterLeftAnimated1 stop')
                         questNum++;
+                        firstStep = firstStep + windowWidth/9;
                         setFlagAnswer(true);
                         setClock(true);
                         setDisableAnswer(false);
@@ -218,8 +227,8 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 14; // giam 2 thi duoc them 5 cau
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 7;
+                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20; // giam 2 thi duoc them 5 cau
+                tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                 Animated.timing(charaterLeftAnimated, {
                     toValue: tempCharaterLeftAnimated,
                     duration: 1000, 
@@ -349,7 +358,8 @@ const QuestGameScreen = ({route, navigation}) => {
         checkAnswer = [];
         flagFirework = false;
         movingBackground = 0;
-        tempCharaterLeftAnimated = 140;
+        firstStep = windowWidth/9;
+        tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED;
         tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED;
         tempBackgroundRightAnimated = 0,
         tempBackgroundBottomAnimated = 0,
@@ -431,14 +441,20 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const apiSetResultGame = async () => {
-        const { code, message, data } = await setResultGame(PARAMS);
+        let params = {
+            access_token: ACCESS_TOKEN,
+            lesson_id: lesson_id,
+            account_id: '1',
+            score: score
+        }
+        const { code, message, data } = await setResultGame(params);
         if (code == HTTP_CODE.CODE_201 || code == HTTP_CODE.CODE_401) {
             toastRef.current.showAlert({
                 content : message, 
                 isSuccess : false
             });
         } else {
-            dataRankGame = data.top10;
+            console.log('Success set score game');
         }
     }
 
@@ -606,9 +622,34 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Rock = () => {
+        let positionTop = DEFAULT_CHARATER_TOP_ANIMATED + 30,
+        positionLeft = DEFAULT_CHARATER_LEFT_ANIMATED + 30;
+        let positionRock = [];
+        // for (let index = 0; index < 10; index++) {
+        //     positionTop = positionTop - 10;
+        //     positionLeft = positionLeft + 20;
+        //     positionRock.push({
+        //         top: positionTop,
+        //         left: positionLeft
+        //     })
+        // }
+        // console.log('Rock',positionRock);
+
+        // <View>
+        //     {positionRock.map((result,index,value) => {
+        //         console.log('value',result);
+        //         return(
+        //             <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: positionTop, left: positionLeft}]} />
+        //         );
+        //     })}
+        // </View>
+
         return (
-            <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: tempCharaterTopAnimated + 40 ,left: tempCharaterLeftAnimated + 30}]} />    
-        )
+            <View style={{top: -500, left: 170}}>
+                <Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock]} />
+            </View>
+            
+        );
     }
 
     return (
@@ -720,8 +761,8 @@ const styles = StyleSheet.create({
         position:'absolute'
     },
     rock: {
-        height: 25,
-        width: 25,
+        height: 30,
+        width: 30,
         position:'absolute'
     },
     backgroundQuest: {
