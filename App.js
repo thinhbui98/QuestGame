@@ -367,6 +367,7 @@ const QuestGameScreen = ({route, navigation}) => {
         setClock(true);
         setFlagAnswer(true);
         setDisableAnswer(false);
+        setcharacterStatus(false);
         if (visibleResult) {
             setVisibleResult(!visibleResult);
         }
@@ -622,17 +623,17 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Rock = () => {
-        let positionTop = DEFAULT_CHARATER_TOP_ANIMATED + 30,
-        positionLeft = DEFAULT_CHARATER_LEFT_ANIMATED + 30;
-        let positionRock = [];
-        // for (let index = 0; index < 10; index++) {
-        //     positionTop = positionTop - 10;
-        //     positionLeft = positionLeft + 20;
-        //     positionRock.push({
-        //         top: positionTop,
-        //         left: positionLeft
-        //     })
-        // }
+        let positionTop = 0,
+        positionLeft = 0;
+        let positionRock = [{top: positionTop, left: positionLeft}];
+        for (let index = 0; index < 10; index++) {
+            positionTop = positionTop - 50;
+            positionLeft = positionLeft + 100;
+            positionRock.push({
+                top: positionTop,
+                left: positionLeft
+            })
+        }
         // console.log('Rock',positionRock);
 
         // <View>
@@ -646,9 +647,25 @@ const QuestGameScreen = ({route, navigation}) => {
 
         return (
             <View style={{top: -500, left: 170}}>
-                <Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock]} />
+                {positionRock.map((result,index,value) => {
+                    return(
+                        <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: result.top, left: result.left}]} />
+                    );
+                })}
+                {/* <Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock]} />
+                <Image source={require('../../Assets/game/rock_02.png')} style={[styles.rock,{top: -50, left: 100}]} /> */}
             </View>
             
+        );
+    }
+
+    const Character = () => {
+        {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
+        return(
+            <Animated.Image
+                source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')}
+                style={[styles.character, {top:charaterTopAnimated,left: charaterLeftAnimated}]}
+            />
         );
     }
 
@@ -666,8 +683,7 @@ const QuestGameScreen = ({route, navigation}) => {
                         <Text style={styles.pointText}>{score < 10 ? '0' + score : score }</Text>
                     </View>
                 </View>
-                <Animated.Image source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')} style={[styles.character, {top:charaterTopAnimated,left: charaterLeftAnimated}]} />
-                {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
+                <Character />
                 {flagFirework ? (
                     <Animated.Image source={require('../../Assets/game/firework.gif')} style={[styles.firework, {top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated}]} />
                 ) : (
