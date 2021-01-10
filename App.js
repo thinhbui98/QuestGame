@@ -83,6 +83,8 @@ var tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED, //100
     tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
+    tempRockLeftAnimated = 170,
+    tempRockTopAnimated = -500,
     firstStep = windowWidth/9,
     movingBackground = 0,
     renderAnwser = [],
@@ -144,7 +146,7 @@ const QuestGameScreen = ({route, navigation}) => {
         [visibleResult, setVisibleResult] = useState(false),
         [visibleRank, setVisibleRank] = useState(false),
         [visibleQuest, setvisibleQuest] = useState(false),
-        [characterStatus, setcharacterStatus] = useState(false),
+        [characterStatus, setcharacterStatus] = useState(1),
         [flagAnswer, setFlagAnswer] = useState(true),
         [clock, setClock] = useState(false),
         [timeClock, setTimeClock] = useState(TIME_ANSWER),
@@ -155,6 +157,8 @@ const QuestGameScreen = ({route, navigation}) => {
         charaterTopAnimated = useRef(new Animated.Value(DEFAULT_CHARATER_TOP_ANIMATED)).current,
         backgroundRightAnimated = useRef(new Animated.Value(0)).current,
         backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current,
+        rockLeftAnimated = useRef(new Animated.Value(170)).current,
+        rockTopAnimated = useRef(new Animated.Value(-500)).current,
     //render cau hoi va cau tra loi
         questions = dataQuestion[questNum].question,
         answer = [dataQuestion[questNum].answer];
@@ -209,7 +213,7 @@ const QuestGameScreen = ({route, navigation}) => {
             trueAnswer = true;
             setClock(false);
             setScore(score + 1);
-            setcharacterStatus(true);
+            setcharacterStatus(2);
             if (score < 3) {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
@@ -227,108 +231,27 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20; // giam 2 thi duoc them 5 cau
-                tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
-                Animated.timing(charaterLeftAnimated, {
-                    toValue: tempCharaterLeftAnimated,
-                    duration: 1000, 
-                }).start(( {finished} ) => {
-                    if (finished) {
-                        console.log('charaterLeftAnimated2 stop')
-                    }
-                });
-                Animated.timing(charaterTopAnimated, {
-                    toValue: tempCharaterTopAnimated,
-                    duration: 1000, 
-                }).start(( {finished} ) => { 
-                    //di chuyen background va nhan vat theo so diem
-                    console.log('charaterTopAnimated2 stop')
-                    if (finished) {
-                        //neu nhat vat di duoc 1/2 width man hinh thi se di chuyen background
-                        if (tempCharaterLeftAnimated > windowWidth/2) {
-                            //tinh so lan di chuyen background
-                            movingBackground = movingBackground + 1;
-                            switch (movingBackground) {
-                                case 1:
-                                    console.log('case1');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
-                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
-                                    break;
-                                case 2:
-                                    console.log('case2');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 60;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-                                    break;
-                                case 3:
-                                    console.log('case3');
-                                    tempCharaterLeftAnimated = tempCharaterLeftAnimated - 120;
-                                    tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
-                                    tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
-                                    tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-                                    break;
-                                default:
-                                    console.log('case last');
-                                    if (questNum < dataQuestion.length - 1) {
-                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
-                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
-                                        tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
-                                        tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
-                                    }
-                                    break;
-                            }
-                            console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
-                            console.log('tempBackgroundBottomAnimated',tempBackgroundBottomAnimated);
-                            //di chuyen background
-                            Animated.timing(backgroundRightAnimated, {
-                                toValue: tempBackgroundRightAnimated,
-                                duration: 1000,
-                            }).start(( {finished} ) => {
-
-                                if (finished) {
-                                    console.log('backgroundRightAnimated1 stop')
-                                }
-                            });
-                            Animated.timing(backgroundBottomAnimated, {
-                                toValue: tempBackgroundBottomAnimated,
-                                duration: 1000,
-                            }).start(( {finished} ) => { 
-                                if (finished) {
-                                    console.log('backgroundBottomAnimated1 stop')
-                                }
-                            });
-
-                            //di chuyen nhan vat
-                            Animated.timing(charaterLeftAnimated, {
-                                toValue: tempCharaterLeftAnimated,
-                                duration: 1000,
-                            }).start(( {finished} ) => {
-                                if (finished) {
-                                    console.log('charaterLeftAnimated3 stop')
-                                }
-                            });
-                            Animated.timing(charaterTopAnimated, {
-                                toValue: tempCharaterTopAnimated,
-                                duration: 1000,
-                            }).start(( {finished} ) => {
-                                if (finished) {
-                                    console.log('tempCharaterTopAnimated3 stop')
-                                    if (questNum == dataQuestion.length - 1) {
-                                        flagFirework = true;
-                                        setVisibleResult(!visibleResult);
-                                        setClock(false);
-                                    } else {
-                                        questNum++;
-                                        setClock(true);
-                                        setFlagAnswer(true);
-                                        setDisableAnswer(false);
-                                    }
-                                }
-                            });
-                        } else {
+                if (score == 3) {
+                    tempCharaterLeftAnimated = tempCharaterLeftAnimated + 30;
+                    tempCharaterTopAnimated = tempCharaterTopAnimated - 40;
+                    Animated.timing(charaterLeftAnimated, {
+                        toValue: tempCharaterLeftAnimated,
+                        duration: 700, 
+                    }).start();
+                    Animated.timing(charaterTopAnimated, {
+                        toValue: tempCharaterTopAnimated,
+                        duration: 700, 
+                    }).start((finished) => {
+                        tempCharaterLeftAnimated = tempCharaterLeftAnimated + 30;
+                        tempCharaterTopAnimated = tempCharaterTopAnimated + 10;
+                        Animated.timing(charaterLeftAnimated, {
+                            toValue: tempCharaterLeftAnimated,
+                            duration: 700, 
+                        }).start();
+                        Animated.timing(charaterTopAnimated, {
+                            toValue: tempCharaterTopAnimated,
+                            duration: 700, 
+                        }).start((finished) => {
                             if (questNum == dataQuestion.length - 1) {
                                 flagFirework = true;
                                 setVisibleResult(!visibleResult);
@@ -339,9 +262,136 @@ const QuestGameScreen = ({route, navigation}) => {
                                 setFlagAnswer(true);
                                 setDisableAnswer(false);
                             }
+                        });
+                    });
+                } else {
+                    tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20; // giam 2 thi duoc them 5 cau
+                    tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
+                    Animated.timing(charaterLeftAnimated, {
+                        toValue: tempCharaterLeftAnimated,
+                        duration: 1000, 
+                    }).start(( {finished} ) => {
+                        if (finished) {
+                            console.log('charaterLeftAnimated2 stop')
                         }
-                    }
-                });
+                    });
+                    Animated.timing(charaterTopAnimated, {
+                        toValue: tempCharaterTopAnimated,
+                        duration: 1000, 
+                    }).start(( {finished} ) => { 
+                        //di chuyen background va nhan vat theo so diem
+                        console.log('charaterTopAnimated2 stop')
+                        if (finished) {
+                            //neu nhat vat di duoc 1/2 width man hinh thi se di chuyen background
+                            if (tempCharaterLeftAnimated > windowWidth * 2/3) {
+                                //tinh so lan di chuyen background
+                                movingBackground = movingBackground + 1;
+                                switch (movingBackground) {
+                                    case 1:
+                                        console.log('case1');
+                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
+                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
+                                        tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
+                                        tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
+                                        break;
+                                    case 2:
+                                        console.log('case2');
+                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 60;
+                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                        tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
+                                        tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+                                        break;
+                                    case 3:
+                                        console.log('case3');
+                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 120;
+                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
+                                        tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
+                                        tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+                                        break;
+                                    default:
+                                        console.log('case last');
+                                        if (questNum < dataQuestion.length - 1) {
+                                            tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
+                                            tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                            tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
+                                            tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
+                                        }
+                                        break;
+                                }
+                                console.log('tempBackgroundRightAnimated',tempBackgroundRightAnimated);
+                                console.log('tempBackgroundBottomAnimated',tempBackgroundBottomAnimated);
+                                //di chuyen background
+                                Animated.timing(backgroundRightAnimated, {
+                                    toValue: tempBackgroundRightAnimated,
+                                    duration: 1000,
+                                }).start(( {finished} ) => {
+
+                                    if (finished) {
+                                        console.log('backgroundRightAnimated1 stop')
+                                    }
+                                });
+                                Animated.timing(backgroundBottomAnimated, {
+                                    toValue: tempBackgroundBottomAnimated,
+                                    duration: 1000,
+                                }).start(( {finished} ) => { 
+                                    if (finished) {
+                                        console.log('backgroundBottomAnimated1 stop')
+                                    }
+                                });
+
+                                //di chuyen cac vien da
+                                Animated.timing(rockLeftAnimated, {
+                                    toValue: 190,
+                                    duration: 1000,
+                                }).start(( {finished} ) => {});
+                                Animated.timing(rockTopAnimated, {
+                                    toValue: -540,
+                                    duration: 1000,
+                                }).start(( {finished} ) => {});
+
+                                //di chuyen nhan vat
+                                Animated.timing(charaterLeftAnimated, {
+                                    toValue: tempCharaterLeftAnimated,
+                                    duration: 1000,
+                                }).start(( {finished} ) => {
+                                    if (finished) {
+                                        console.log('charaterLeftAnimated3 stop')
+                                    }
+                                });
+                                Animated.timing(charaterTopAnimated, {
+                                    toValue: tempCharaterTopAnimated,
+                                    duration: 1000,
+                                }).start(( {finished} ) => {
+                                    if (finished) {
+                                        console.log('tempCharaterTopAnimated3 stop')
+                                        if (questNum == dataQuestion.length - 1) {
+                                            flagFirework = true;
+                                            setVisibleResult(!visibleResult);
+                                            setClock(false);
+                                        } else {
+                                            questNum++;
+                                            setClock(true);
+                                            setFlagAnswer(true);
+                                            setDisableAnswer(false);
+                                        }
+                                    }
+                                });
+                            } else {
+                                if (questNum == dataQuestion.length - 1) {
+                                    flagFirework = true;
+                                    setVisibleResult(!visibleResult);
+                                    setClock(false);
+                                } else {
+                                    questNum++;
+                                    setClock(true);
+                                    setFlagAnswer(true);
+                                    setDisableAnswer(false);
+                                }
+                            }
+                        }
+                    });
+                }
+                
             }
         } else {
             trueAnswer = false;
@@ -367,7 +417,7 @@ const QuestGameScreen = ({route, navigation}) => {
         setClock(true);
         setFlagAnswer(true);
         setDisableAnswer(false);
-        setcharacterStatus(false);
+        setcharacterStatus(1);
         if (visibleResult) {
             setVisibleResult(!visibleResult);
         }
@@ -626,6 +676,7 @@ const QuestGameScreen = ({route, navigation}) => {
         let positionTop = 0,
         positionLeft = 0;
         let positionRock = [{top: positionTop, left: positionLeft}];
+        let positionBackground = {top: rockTopAnimated, left: rockBottomAnimated}
         for (let index = 0; index < 10; index++) {
             positionTop = positionTop - 50;
             positionLeft = positionLeft + 100;
@@ -634,36 +685,64 @@ const QuestGameScreen = ({route, navigation}) => {
                 left: positionLeft
             })
         }
-        // console.log('Rock',positionRock);
-
-        // <View>
-        //     {positionRock.map((result,index,value) => {
-        //         console.log('value',result);
-        //         return(
-        //             <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: positionTop, left: positionLeft}]} />
-        //         );
-        //     })}
-        // </View>
-
+        if (movingBackground == 1) {
+            // positionRock = [];
+            // positionTop = 0;
+            // positionLeft = 0;
+            // for (let index = 0; index < 10; index++) {
+            //     positionTop = positionTop - 50;
+            //     positionLeft = positionLeft + 100;
+            //     positionRock.push({
+            //         top: positionTop,
+            //         left: positionLeft
+            //     })
+            // }
+            // positionRock.shift();
+            // positionRock.push({
+            //     top: positionTop,
+            //     left: positionLeft
+            // })
+            Animated.timing(rockLeftAnimated, {
+                toValue: 190,
+                duration: 1000,
+            }).start(( {finished} ) => {});
+            Animated.timing(rockTopAnimated, {
+                toValue: -600,
+                duration: 1000,
+            }).start(( {finished} ) => {});
+        }
+        console.log('abvc',positionRock);
+        let rockNum = Math.floor(Math.random() * 8) + 1;
+        let rockImg = require('../../Assets/game/rock_01.png');
         return (
-            <View style={{top: -500, left: 170}}>
+            <Animated.View style={[{top: rockTopAnimated, left: rockLeftAnimated}]}>
                 {positionRock.map((result,index,value) => {
                     return(
-                        <Animated.Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock, {top: result.top, left: result.left}]} />
+                        <Image source={rockImg} style={[styles.rock, {top: result.top, left: result.left}]} />
                     );
                 })}
-                {/* <Image source={require('../../Assets/game/rock_01.png')} style={[styles.rock]} />
-                <Image source={require('../../Assets/game/rock_02.png')} style={[styles.rock,{top: -50, left: 100}]} /> */}
-            </View>
+            </Animated.View>
             
         );
     }
 
     const Character = () => {
         {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
+        let characterImg = require('../../Assets/game/character_male_hello.png');
+        switch (characterStatus) {
+            case 1:
+                characterImg = require('../../Assets/game/character_male_hello.png');
+                break;
+            case 2:
+                characterImg = require('../../Assets/game/character_male_moving.gif');
+                break;
+            case 3:
+                characterImg = require('../../Assets/game/character_male_hello.png');
+                break;
+        }
         return(
             <Animated.Image
-                source={characterStatus ? require('../../Assets/game/character_male_moving.gif') : require('../../Assets/game/character_male_hello.png')}
+                source={characterImg}
                 style={[styles.character, {top:charaterTopAnimated,left: charaterLeftAnimated}]}
             />
         );
