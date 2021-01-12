@@ -76,15 +76,17 @@ const windowWidth = Dimensions.get('window').width,
     // DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 250, //280
     DEFAULT_CHARATER_TOP_ANIMATED = 220, //190
     DEFAULT_CHARATER_LEFT_ANIMATED = 140,
-    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 350, //280
+    DEFAULT_BACKGROUND_BOTTOM_ANIMATED = 350, //280,
+    DEFAULT_ROCK_LEFT_ANIMATED = 170,
+    DEFAULT_ROCK_TOP_ANIMATED = -500,
     TIME_ANSWER = 300
 
 var tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED, //100
     tempCharaterTopAnimated = DEFAULT_CHARATER_TOP_ANIMATED,
     tempBackgroundRightAnimated = 0,
     tempBackgroundBottomAnimated = 0,
-    tempRockLeftAnimated = 170,
-    tempRockTopAnimated = -500,
+    tempRockLeftAnimated = DEFAULT_ROCK_LEFT_ANIMATED,
+    tempRockTopAnimated = DEFAULT_ROCK_TOP_ANIMATED,
     firstStep = windowWidth/9,
     movingBackground = 0,
     renderAnwser = [],
@@ -157,8 +159,8 @@ const QuestGameScreen = ({route, navigation}) => {
         charaterTopAnimated = useRef(new Animated.Value(DEFAULT_CHARATER_TOP_ANIMATED)).current,
         backgroundRightAnimated = useRef(new Animated.Value(0)).current,
         backgroundBottomAnimated = useRef(new Animated.Value(DEFAULT_BACKGROUND_BOTTOM_ANIMATED)).current,
-        rockLeftAnimated = useRef(new Animated.Value(170)).current,
-        rockTopAnimated = useRef(new Animated.Value(-500)).current,
+        rockLeftAnimated = useRef(new Animated.Value(DEFAULT_ROCK_LEFT_ANIMATED)).current,
+        rockTopAnimated = useRef(new Animated.Value(-DEFAULT_ROCK_TOP_ANIMATED)).current,
     //render cau hoi va cau tra loi
         questions = dataQuestion[questNum].question,
         answer = [dataQuestion[questNum].answer];
@@ -218,7 +220,7 @@ const QuestGameScreen = ({route, navigation}) => {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
                     toValue: firstStep,
-                    duration: 1000,
+                    duration: 1500,
                 }).start(( {finished} ) => {
                     if (finished) {
                         console.log('charaterLeftAnimated1 stop')
@@ -236,21 +238,21 @@ const QuestGameScreen = ({route, navigation}) => {
                     tempCharaterTopAnimated = tempCharaterTopAnimated - 40;
                     Animated.timing(charaterLeftAnimated, {
                         toValue: tempCharaterLeftAnimated,
-                        duration: 700, 
+                        duration: 1000, 
                     }).start();
                     Animated.timing(charaterTopAnimated, {
                         toValue: tempCharaterTopAnimated,
-                        duration: 700, 
+                        duration: 1000, 
                     }).start((finished) => {
                         tempCharaterLeftAnimated = tempCharaterLeftAnimated + 30;
                         tempCharaterTopAnimated = tempCharaterTopAnimated + 10;
                         Animated.timing(charaterLeftAnimated, {
                             toValue: tempCharaterLeftAnimated,
-                            duration: 700, 
+                            duration: 1000, 
                         }).start();
                         Animated.timing(charaterTopAnimated, {
                             toValue: tempCharaterTopAnimated,
-                            duration: 700, 
+                            duration: 1000, 
                         }).start((finished) => {
                             if (questNum == dataQuestion.length - 1) {
                                 flagFirework = true;
@@ -293,6 +295,8 @@ const QuestGameScreen = ({route, navigation}) => {
                                         tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
+                                        tempRockLeftAnimated = tempRockLeftAnimated - 90;
+                                        tempRockTopAnimated = tempRockTopAnimated + 40;
                                         break;
                                     case 2:
                                         console.log('case2');
@@ -341,11 +345,11 @@ const QuestGameScreen = ({route, navigation}) => {
 
                                 //di chuyen cac vien da
                                 Animated.timing(rockLeftAnimated, {
-                                    toValue: 190,
+                                    toValue: tempRockLeftAnimated,
                                     duration: 1000,
                                 }).start(( {finished} ) => {});
                                 Animated.timing(rockTopAnimated, {
-                                    toValue: -540,
+                                    toValue: tempRockTopAnimated,
                                     duration: 1000,
                                 }).start(( {finished} ) => {});
 
@@ -674,9 +678,8 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const Rock = () => {
         let positionTop = 0,
-        positionLeft = 0;
-        let positionRock = [{top: positionTop, left: positionLeft}];
-        let positionBackground = {top: rockTopAnimated, left: rockBottomAnimated}
+            positionLeft = 0,
+            positionRock = [{top: positionTop, left: positionLeft}];
         for (let index = 0; index < 10; index++) {
             positionTop = positionTop - 50;
             positionLeft = positionLeft + 100;
@@ -685,34 +688,6 @@ const QuestGameScreen = ({route, navigation}) => {
                 left: positionLeft
             })
         }
-        if (movingBackground == 1) {
-            // positionRock = [];
-            // positionTop = 0;
-            // positionLeft = 0;
-            // for (let index = 0; index < 10; index++) {
-            //     positionTop = positionTop - 50;
-            //     positionLeft = positionLeft + 100;
-            //     positionRock.push({
-            //         top: positionTop,
-            //         left: positionLeft
-            //     })
-            // }
-            // positionRock.shift();
-            // positionRock.push({
-            //     top: positionTop,
-            //     left: positionLeft
-            // })
-            Animated.timing(rockLeftAnimated, {
-                toValue: 190,
-                duration: 1000,
-            }).start(( {finished} ) => {});
-            Animated.timing(rockTopAnimated, {
-                toValue: -600,
-                duration: 1000,
-            }).start(( {finished} ) => {});
-        }
-        console.log('abvc',positionRock);
-        let rockNum = Math.floor(Math.random() * 8) + 1;
         let rockImg = require('../../Assets/game/rock_01.png');
         return (
             <Animated.View style={[{top: rockTopAnimated, left: rockLeftAnimated}]}>
@@ -752,7 +727,7 @@ const QuestGameScreen = ({route, navigation}) => {
         <View style={styles.background}>
             <View style={{ height: windowWidth * 0.7}}>
                 <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
-                <View style={{top: Platform.OS == 'ios' ? -650 : -640,flexDirection: 'row',justifyContent: 'space-between'}}>
+                <View style={{top: Platform.OS == 'ios' ? -650 : -710,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={styles.clockCountDown}>
                         <Image source={require('../../Assets/game/hourglass.gif')} style={styles.hourGlass} />
                         <TimeCountDown />
