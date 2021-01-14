@@ -295,8 +295,6 @@ const QuestGameScreen = ({route, navigation}) => {
                                         tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
-                                        tempRockLeftAnimated = tempRockLeftAnimated - 90;
-                                        tempRockTopAnimated = tempRockTopAnimated + 40;
                                         break;
                                     case 2:
                                         console.log('case2');
@@ -344,14 +342,14 @@ const QuestGameScreen = ({route, navigation}) => {
                                 });
 
                                 //di chuyen cac vien da
-                                Animated.timing(rockLeftAnimated, {
-                                    toValue: tempRockLeftAnimated,
-                                    duration: 1000,
-                                }).start(( {finished} ) => {});
-                                Animated.timing(rockTopAnimated, {
-                                    toValue: tempRockTopAnimated,
-                                    duration: 1000,
-                                }).start(( {finished} ) => {});
+                                // Animated.timing(rockLeftAnimated, {
+                                //     toValue: tempRockLeftAnimated,
+                                //     duration: 1000,
+                                // }).start(( {finished} ) => {});
+                                // Animated.timing(rockTopAnimated, {
+                                //     toValue: tempRockTopAnimated,
+                                //     duration: 1000,
+                                // }).start(( {finished} ) => {});
 
                                 //di chuyen nhan vat
                                 Animated.timing(charaterLeftAnimated, {
@@ -680,23 +678,31 @@ const QuestGameScreen = ({route, navigation}) => {
         let positionTop = 0,
             positionLeft = 0,
             positionRock = [{top: positionTop, left: positionLeft}];
-        for (let index = 0; index < 10; index++) {
-            positionTop = positionTop - 50;
-            positionLeft = positionLeft + 100;
+        for (let index = 0; index < 14; index++) {
+            if (index > 3) {
+                positionTop = positionTop - 60;
+                positionLeft = positionLeft + 100;
+            } else {
+                positionTop = positionTop - 50;
+                positionLeft = positionLeft + 100;
+            }
             positionRock.push({
                 top: positionTop,
                 left: positionLeft
             })
         }
-        let rockImg = require('../../Assets/game/rock_01.png');
+        
+
+        let link = '../../Assets/game/rock_01.png';
+        let rockImg = require(link);
         return (
-            <Animated.View style={[{top: rockTopAnimated, left: rockLeftAnimated}]}>
+            <View style={[{top: 0, left: 70}]}>
                 {positionRock.map((result,index,value) => {
                     return(
                         <Image source={rockImg} style={[styles.rock, {top: result.top, left: result.left}]} />
                     );
                 })}
-            </Animated.View>
+            </View>
             
         );
     }
@@ -726,7 +732,11 @@ const QuestGameScreen = ({route, navigation}) => {
     return (
         <View style={styles.background}>
             <View style={{ height: windowWidth * 0.7}}>
-                <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} />
+                {/* <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} /> */}
+                <Animated.View style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]}>
+                    <Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame]} />
+                    <Rock />
+                </Animated.View>
                 <View style={{top: Platform.OS == 'ios' ? -650 : -710,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={styles.clockCountDown}>
                         <Image source={require('../../Assets/game/hourglass.gif')} style={styles.hourGlass} />
@@ -743,7 +753,6 @@ const QuestGameScreen = ({route, navigation}) => {
                 ) : (
                     <View></View>
                 )}
-                <Rock />
             </View>
             <View style={[styles.backgroundQuest, {height: windowHeight - (windowWidth * 0.9)}]}>
                 <ImageBackground source={require('../../Assets/game//hexagon.png')} style={[styles.quest,{height: '16%'}]}>
