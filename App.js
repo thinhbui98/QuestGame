@@ -94,6 +94,7 @@ var tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED, //100
     trueAnswer = 0,
     questNum = 0,
     flagFirework = false,
+    flagQuestion = false,
     dataRankGame = {};
 
 const QuestGameScreen = ({route, navigation}) => {
@@ -120,7 +121,10 @@ const QuestGameScreen = ({route, navigation}) => {
 
     const processQuestionData = (data) => {
         let listQuestion = [];
-        // shuffleArray(data);
+        // if (flagQuestion == false) {
+        //     shuffleArray(data);
+        //     flagQuestion = true;
+        // }
         for (let index = 0; index < data.length; index++) {
             if (data[index].title_vn != '-') {
                 if (listQuestion.length < 30) {
@@ -134,8 +138,8 @@ const QuestGameScreen = ({route, navigation}) => {
                 }
             }
         }
+        console.log(listQuestion);
         return listQuestion;
-        // return shuffleArray(listQuestion);
     }
     
     const dataAnswer =  processAnswerData(lesson_data);
@@ -194,8 +198,7 @@ const QuestGameScreen = ({route, navigation}) => {
                 }
             }
         }
-        // console.log('answer123123ư',answer);
-        console.log('questNum',questNum);
+        console.log('answer',answer);
         for (let j = 0; j < answer.length; j++) {
             if (answer[j] == dataQuestion[questNum].answer) {
                 checkAnswer[j] = true;
@@ -239,6 +242,8 @@ const QuestGameScreen = ({route, navigation}) => {
                     Animated.timing(charaterLeftAnimated, {
                         toValue: tempCharaterLeftAnimated,
                         duration: 1000, 
+                    duration: 1000, 
+                        duration: 1000, 
                     }).start();
                     Animated.timing(charaterTopAnimated, {
                         toValue: tempCharaterTopAnimated,
@@ -266,6 +271,16 @@ const QuestGameScreen = ({route, navigation}) => {
                             }
                         });
                     });
+
+                    // Animated.timing(charaterTopAnimated, {
+                    //     toValue: tempCharaterTopAnimated - 30,
+                    //     duration: 800,
+                    // }).start(( {finished} ) => {
+                    //     Animated.timing(charaterTopAnimated, {
+                    //         toValue: tempCharaterTopAnimated,
+                    //         duration: 800,
+                    //     }).start();
+                    // });
                 } else {
                     tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20; // giam 2 thi duoc them 5 cau
                     tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
@@ -279,8 +294,8 @@ const QuestGameScreen = ({route, navigation}) => {
                     });
                     Animated.timing(charaterTopAnimated, {
                         toValue: tempCharaterTopAnimated,
-                        duration: 1000, 
-                    }).start(( {finished} ) => { 
+                        duration: 1000,
+                    }).start(( {finished} ) => {
                         //di chuyen background va nhan vat theo so diem
                         console.log('charaterTopAnimated2 stop')
                         if (finished) {
@@ -335,21 +350,11 @@ const QuestGameScreen = ({route, navigation}) => {
                                 Animated.timing(backgroundBottomAnimated, {
                                     toValue: tempBackgroundBottomAnimated,
                                     duration: 1000,
-                                }).start(( {finished} ) => { 
+                                }).start(( {finished} ) => {
                                     if (finished) {
                                         console.log('backgroundBottomAnimated1 stop')
                                     }
                                 });
-
-                                //di chuyen cac vien da
-                                // Animated.timing(rockLeftAnimated, {
-                                //     toValue: tempRockLeftAnimated,
-                                //     duration: 1000,
-                                // }).start(( {finished} ) => {});
-                                // Animated.timing(rockTopAnimated, {
-                                //     toValue: tempRockTopAnimated,
-                                //     duration: 1000,
-                                // }).start(( {finished} ) => {});
 
                                 //di chuyen nhan vat
                                 Animated.timing(charaterLeftAnimated, {
@@ -677,7 +682,8 @@ const QuestGameScreen = ({route, navigation}) => {
     const Rock = () => {
         let positionTop = 0,
             positionLeft = 0,
-            positionRock = [{top: positionTop, left: positionLeft}];
+            positionRock = [{top: positionTop, left: positionLeft}]
+            arrayRock = [];
         for (let index = 0; index < 14; index++) {
             if (index > 3) {
                 positionTop = positionTop - 60;
@@ -691,8 +697,12 @@ const QuestGameScreen = ({route, navigation}) => {
                 left: positionLeft
             })
         }
-        
-
+        // for (let indexRock = 0; indexRock < 5; indexRock++) {
+        //     if (condition) {
+                
+        //     }
+        // }
+        let randomNumber = Math.floor(Math.random() * 8) + 1;
         let link = '../../Assets/game/rock_01.png';
         let rockImg = require(link);
         return (
@@ -703,7 +713,35 @@ const QuestGameScreen = ({route, navigation}) => {
                     );
                 })}
             </View>
-            
+        );
+    }
+
+    const Food = () => {
+        let positionTop = -150,
+            positionLeft = 140,
+            positionFood = [{top: positionTop, left: positionLeft}]
+            arrayRock = [];
+        for (let index = 0; index < 14; index++) {
+            if (index > 3) {
+                positionTop = positionTop - 60;
+                positionLeft = positionLeft + 100;
+            } else {
+                positionTop = positionTop - 50;
+                positionLeft = positionLeft + 100;
+            }
+            positionFood.push({
+                top: positionTop,
+                left: positionLeft
+            })
+        }
+        return (
+            <View style={[{top: 0, left: 70}]}>
+                {positionFood.map((result,index,value) => {
+                    return(
+                        <Image source={require('../../Assets/game/food_01.png')} style={[styles.rock, {top: result.top, left: result.left}]} />
+                    );
+                })}
+            </View>
         );
     }
 
@@ -736,6 +774,7 @@ const QuestGameScreen = ({route, navigation}) => {
                 <Animated.View style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]}>
                     <Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame]} />
                     <Rock />
+                    <Food />
                 </Animated.View>
                 <View style={{top: Platform.OS == 'ios' ? -650 : -710,flexDirection: 'row',justifyContent: 'space-between'}}>
                     <View style={styles.clockCountDown}>
