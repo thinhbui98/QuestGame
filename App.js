@@ -10,8 +10,7 @@ import {
     TouchableOpacity,
     VirtualizedList,
     Dimensions,
-    LogBox,
-    Button
+    LogBox
 } from 'react-native';
 import { Overlay } from 'react-native-elements';
 import CountDown from 'react-native-countdown-component';
@@ -19,55 +18,6 @@ import { ACCESS_TOKEN,HTTP_CODE } from '../../Constants';
 import { useStoreState, useStoreActions } from 'easy-peasy';
 import { shuffleArray } from '../../Utils/ArrayUtils';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// Icon.loadFont();
-
-const rank = [
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 30
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 28
-    },
-    {
-        name:'Nguyen Van C',
-        class: 'A123',
-        score: 27
-    },
-    {
-        name:'Nguyen Van D',
-        class: 'B123',
-        score: 23
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 21
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 17
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 17
-    },
-    {
-        name:'Nguyen Van B',
-        class: 'B199',
-        score: 16
-    },
-    {
-        name:'Nguyen Van A',
-        class: 'A123',
-        score: 9
-    }
-];
 
 LogBox.ignoreAllLogs();
 const windowWidth = Dimensions.get('window').width,
@@ -81,6 +31,8 @@ const windowWidth = Dimensions.get('window').width,
     DEFAULT_ROCK_TOP_ANIMATED = 500,
     BONUS_ROCK_FLAG = 0,
     BONUS_FOOD_FLAG = 1,
+    MALE_FLAG = 0,
+    FEMALE_FLAG = 1,
     TIME_ANSWER = 300
 
 var tempCharaterLeftAnimated = DEFAULT_CHARATER_LEFT_ANIMATED, //100
@@ -105,12 +57,15 @@ const QuestGameScreen = ({route, navigation}) => {
         getRankGame: actions.game.getRankGame,
         setResultGame: actions.game.setResultGame
     })),
+        { userInfo } = useStoreState(state => ({
+        userInfo : state.user.userInfo
+    })),
         { title, lesson_id, lesson_data } = route.params,
         PARAMS = {
             access_token: ACCESS_TOKEN,
             lesson_id: lesson_id
         }
-
+        console.log('userInfo',userInfo);
     const processAnswerData = (data) => {
         let listAnswer = [];
         for (let index = 0; index < data.length; index++) {
@@ -127,43 +82,57 @@ const QuestGameScreen = ({route, navigation}) => {
         //     shuffleArray(data);
         //     flagQuestion = true;
         // }
+        let rockPosition = [ 5, 9, 12, 16, 19, 23],
+            foodPosition = [ 6 ];
         for (let index = 0; index < data.length; index++) {
+            let bonus = false;
             if (data[index].title_vn != '-') {
                 if (listQuestion.length < 30) {
+                    if (rockPosition.indexOf(index) != -1) {
+                        bonus = BONUS_ROCK_FLAG;
+                    } else if(rockPosition.indexOf(index) != -1) {
+                        bonus = BONUS_FOOD_FLAG;
+                    }
                     listQuestion.push({
                         question: data[index].title_vn,
                         answer: data[index].title_jp,
-                        position: index
+                        position: index,
+                        bonus: bonus
                     });
                 } else {
                     break;
                 }
             }
         }
-        
-        if (flagBonus == false) {
-            flagBonus = true;
-            let bonus = 0,
-            tempRandom = [],
-            numRock = 0,
-            numFood = 0
-            while (bonus < 12) {
-                let randIndex = Math.floor(Math.random() * 23) + 4;
-                if (tempRandom.indexOf(randIndex) == -1) {
-                    if (randIndex % 2 == 0 && numRock < 6) {
-                        listQuestion[randIndex].bonus = BONUS_ROCK_FLAG;
-                        tempRandom.push(randIndex);
-                        numRock++;
-                        bonus++;
-                    } else if(randIndex % 2 != 0 && numFood < 6) {
-                        listQuestion[randIndex].bonus = BONUS_FOOD_FLAG;
-                        tempRandom.push(randIndex);
-                        numFood++;
-                        bonus++;
-                    }
-                }
-            }
-        }
+        // if (flagBonus == false) {
+        //     flagBonus = true;
+        //     let bonus = 0,
+        //     arrayRandom = [],
+        //     numRock = 0,
+        //     numFood = 0,
+        //     tempRock = 0,
+        //     tempFood = 0 
+        //     while (bonus < 12) {
+        //         let randIndex = Math.floor(Math.random() * 23) + 4;
+        //         if (arrayRandom.indexOf(randIndex) == -1) {
+        //             if (randIndex % 2 == 0 && numRock < 6) {
+        //                 if (randIndex > tempRock + 4 || randIndex < tempRock - 4 ) {
+        //                     listQuestion[randIndex].bonus = BONUS_ROCK_FLAG;
+        //                     arrayRandom.push(randIndex);
+        //                     numRock++;
+        //                     bonus++;
+        //                     tempRock = randIndex;
+        //                 }
+        //             } else if(randIndex % 2 != 0 && numFood < 6) {
+        //                 listQuestion[randIndex].bonus = BONUS_FOOD_FLAG;
+        //                 arrayRandom.push(randIndex);
+        //                 numFood++;
+        //                 bonus++;
+                        
+        //             }
+        //         }
+        //     }
+        // }
         return listQuestion;
     }
 
@@ -194,7 +163,7 @@ const QuestGameScreen = ({route, navigation}) => {
         opacityFoodAnimated = useRef(new Animated.Value(1)).current,
     //render cau hoi va cau tra loi
         questions = dataQuestion[questNum].question,
-        answer = [dataQuestion[questNum].answer];
+        answer = [dataQuestion[questNum].answer,dataQuestion[questNum].answer,dataQuestion[questNum].answer,dataQuestion[questNum].answer];
 
         useLayoutEffect(() => {
             navigation.setOptions({
@@ -212,26 +181,26 @@ const QuestGameScreen = ({route, navigation}) => {
         }, [])
 
     if (flagAnswer) {
-        let i = 0, temp;
-        while (i < 3) {
-            let rand = Math.floor(Math.random() * dataAnswer.length);
-            if(answer.indexOf(dataAnswer[rand]) == -1){
-                if(dataAnswer[rand] != answer[0] && rand != temp){
-                    answer.push(dataAnswer[rand]);
-                    answer.sort(() => Math.random() - 0.5);
-                    temp = rand;
-                    i++;
-                }
-            }
-        }
-        console.log('answer',answer);
-        for (let j = 0; j < answer.length; j++) {
-            if (answer[j] == dataQuestion[questNum].answer) {
-                checkAnswer[j] = true;
-            } else {
-                checkAnswer[j] = false;
-            }
-        }
+        // let i = 0, temp;
+        // while (i < 3) {
+        //     let rand = Math.floor(Math.random() * dataAnswer.length);
+        //     if(answer.indexOf(dataAnswer[rand]) == -1){
+        //         if(dataAnswer[rand] != answer[0] && rand != temp){
+        //             answer.push(dataAnswer[rand]);
+        //             answer.sort(() => Math.random() - 0.5);
+        //             temp = rand;
+        //             i++;
+        //         }
+        //     }
+        // }
+        // console.log('answer',answer);
+        // for (let j = 0; j < answer.length; j++) {
+        //     if (answer[j] == dataQuestion[questNum].answer) {
+        //         checkAnswer[j] = true;
+        //     } else {
+        //         checkAnswer[j] = false;
+        //     }
+        // }
         renderAnwser = answer;
         console.log('checkAnswer',checkAnswer);
         setFlagAnswer(false);
@@ -245,7 +214,7 @@ const QuestGameScreen = ({route, navigation}) => {
             setClock(false);
             setScore(score + 1);
             setcharacterStatus(2);
-            if (score < 3) {
+            if (questNum < 3) {
                 //Lan dau tien di chuyen nhan vat
                 Animated.timing(charaterLeftAnimated, {
                     toValue: firstStep,
@@ -262,33 +231,28 @@ const QuestGameScreen = ({route, navigation}) => {
                 });
             } else {
                 //Cac lan tiep theo
-                if (dataQuestion[questNum].bonus != 'undefined' && dataQuestion[questNum].bonus == BONUS_ROCK_FLAG) {
+                if (dataQuestion[questNum].bonus === BONUS_ROCK_FLAG) {
+                    console.log('hello',questNum);
                     tempCharaterLeftAnimated = tempCharaterLeftAnimated + 30;
                     tempCharaterTopAnimated = tempCharaterTopAnimated - 40;
+                    Animated.timing(charaterTopAnimated, {
+                        toValue: tempCharaterTopAnimated,
+                        duration: 1000,
+                    }).start((finished) => {});
                     Animated.timing(charaterLeftAnimated, {
                         toValue: tempCharaterLeftAnimated,
                         duration: 1000, 
-                    duration: 1000, 
-                        duration: 1000, 
-                    }).start();
-                    Animated.timing(charaterTopAnimated, {
-                        toValue: tempCharaterTopAnimated,
-                        duration: 1000, 
                     }).start((finished) => {
                         tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20;
-                        tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
-                        Animated.timing(charaterLeftAnimated, {
-                            toValue: tempCharaterLeftAnimated,
-                            duration: 1000, 
-                        }).start(( {finished} ) => {
-                            if (finished) {
-                                console.log('charaterLeftAnimated2 stop')
-                            }
-                        });
+                        tempCharaterTopAnimated = tempCharaterTopAnimated + 10;
                         Animated.timing(charaterTopAnimated, {
                             toValue: tempCharaterTopAnimated,
                             duration: 1000,
-                        }).start(( {finished} ) => {
+                        }).start((finished) => {});
+                        Animated.timing(charaterLeftAnimated, {
+                            toValue: tempCharaterLeftAnimated,
+                            duration: 1000, 
+                        }).start((finished) => {
                             //di chuyen background va nhan vat theo so diem
                             console.log('charaterTopAnimated2 stop')
                             if (finished) {
@@ -298,23 +262,23 @@ const QuestGameScreen = ({route, navigation}) => {
                                     movingBackground = movingBackground + 1;
                                     switch (movingBackground) {
                                         case 1:
-                                            console.log('case1');
+                                            console.log('case11');
                                             tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
                                             tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
                                             tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                             tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
                                             break;
                                         case 2:
-                                            console.log('case2');
+                                            console.log('case22');
                                             tempCharaterLeftAnimated = tempCharaterLeftAnimated - 60;
                                             tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
                                             tempBackgroundRightAnimated = tempBackgroundRightAnimated + 80;
                                             tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                             break;
                                         case 3:
-                                            console.log('case3');
-                                            tempCharaterLeftAnimated = tempCharaterLeftAnimated - 120;
-                                            tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
+                                            console.log('case33');
+                                            tempCharaterLeftAnimated = tempCharaterLeftAnimated - 140;
+                                            tempCharaterTopAnimated = tempCharaterTopAnimated + 50;
                                             tempBackgroundRightAnimated = tempBackgroundRightAnimated + 150;
                                             tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                             break;
@@ -322,7 +286,7 @@ const QuestGameScreen = ({route, navigation}) => {
                                             console.log('case last');
                                             if (questNum < dataQuestion.length - 1) {
                                                 tempCharaterLeftAnimated = tempCharaterLeftAnimated - 180;
-                                                tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
+                                                tempCharaterTopAnimated = tempCharaterTopAnimated + 50;
                                                 tempBackgroundRightAnimated = tempBackgroundRightAnimated + 180;
                                                 tempBackgroundBottomAnimated = tempBackgroundBottomAnimated - 50;
                                             }
@@ -391,7 +355,7 @@ const QuestGameScreen = ({route, navigation}) => {
                             }
                         });
                     });
-                } else if (dataQuestion[questNum].bonus != 'undefined' && dataQuestion[questNum].bonus == BONUS_FOOD_FLAG) {
+                } else if (dataQuestion[questNum].bonus === BONUS_FOOD_FLAG) {
                     tempCharaterLeftAnimated = tempCharaterLeftAnimated + 20;
                     tempCharaterTopAnimated = tempCharaterTopAnimated - 10;
                     Animated.timing(charaterTopAnimated, {
@@ -546,8 +510,8 @@ const QuestGameScreen = ({route, navigation}) => {
                                 switch (movingBackground) {
                                     case 1:
                                         console.log('case1');
-                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 70;
-                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 30;
+                                        tempCharaterLeftAnimated = tempCharaterLeftAnimated - 80;
+                                        tempCharaterTopAnimated = tempCharaterTopAnimated + 40;
                                         tempBackgroundRightAnimated = tempBackgroundRightAnimated + 100;
                                         tempBackgroundBottomAnimated = tempBackgroundBottomAnimated + 300;
                                         break;
@@ -613,6 +577,7 @@ const QuestGameScreen = ({route, navigation}) => {
                                         console.log('tempCharaterTopAnimated3 stop')
                                         if (questNum == dataQuestion.length - 1) {
                                             flagFirework = true;
+                                            setcharacterStatus(3);
                                             setVisibleResult(!visibleResult);
                                             setClock(false);
                                         } else {
@@ -626,6 +591,7 @@ const QuestGameScreen = ({route, navigation}) => {
                             } else {
                                 if (questNum == dataQuestion.length - 1) {
                                     flagFirework = true;
+                                    setcharacterStatus(3);
                                     setVisibleResult(!visibleResult);
                                     setClock(false);
                                 } else {
@@ -920,27 +886,25 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Rock = () => {
-        let positionTop = 0,
-            positionLeft = 70,
-            positionRock = [{top: positionTop, left: positionLeft}]
-            arrayRock = [];
-        for (let index = 0; index < 14; index++) {
+        let positionTop = -10,
+            positionLeft = 90,
+            positionRock = [{top: positionTop, left: positionLeft}],
+            randomNumber = Math.floor(Math.random() * 10);
+        for (let index = 0; index < 6; index++) {
             if (index > 3) {
                 positionTop = positionTop - 60;
                 positionLeft = positionLeft + 100;
             } else {
-                positionTop = positionTop - 50;
-                positionLeft = positionLeft + 100;
+                positionTop = positionTop - 60;
+                positionLeft = positionLeft + 120;
             }
             positionRock.push({
                 top: positionTop,
                 left: positionLeft
             })
         }
-        console.log('rock',dataQuestion);
-        let randomNumber = Math.floor(Math.random() * 8) + 1;
-        let link = '../../Assets/game/rock_01.png';
-        let rockImg = require(link);
+
+        let rockImg = require('../../Assets/game/rock_01.png');
         return (
             <View>
                 {positionRock.map((result,index,value) => {
@@ -953,10 +917,9 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Food = () => {
-        let positionTop = -130,
-            positionLeft = 200,
+        let positionTop = -170,
+            positionLeft = 250,
             positionFood = [{top: positionTop, left: positionLeft}]
-            arrayRock = [];
         for (let index = 0; index < 14; index++) {
             positionTop = positionTop - 60;
             positionLeft = positionLeft + 100;
@@ -981,18 +944,31 @@ const QuestGameScreen = ({route, navigation}) => {
     }
 
     const Character = () => {
-        {/* <Animated.Image source={characterStatus ? require('../../Assets/game/character_female_moving.gif') : require('../../Assets/game/character_female_hello.png')} style={{height: 70, width:36, top:charaterTopAnimated,left: charaterLeftAnimated, position:'absolute'}} /> */}
         let characterImg = require('../../Assets/game/character_male_hello.png');
-        switch (characterStatus) {
-            case 1:
-                characterImg = require('../../Assets/game/character_male_hello.png');
-                break;
-            case 2:
-                characterImg = require('../../Assets/game/character_male_moving.gif');
-                break;
-            case 3:
-                characterImg = require('../../Assets/game/character_male_hello.png');
-                break;
+        if (userInfo.sex == MALE_FLAG) {
+            switch (characterStatus) {
+                case 1:
+                    characterImg = require('../../Assets/game/character_male_hello.png');
+                    break;
+                case 2:
+                    characterImg = require('../../Assets/game/character_male_moving.gif');
+                    break;
+                case 3:
+                    characterImg = require('../../Assets/game/character_male_end.png');
+                    break;
+            }
+        } else {
+            switch (characterStatus) {
+                case 1:
+                    characterImg = require('../../Assets/game/character_female_hello.png');
+                    break;
+                case 2:
+                    characterImg = require('../../Assets/game/character_female_moving.gif');
+                    break;
+                case 3:
+                    characterImg = require('../../Assets/game/character_female_end.png');
+                    break;
+            }
         }
         return(
             <Animated.Image
@@ -1005,7 +981,6 @@ const QuestGameScreen = ({route, navigation}) => {
     return (
         <View style={styles.background}>
             <View style={{ height: windowWidth * 0.7}}>
-                {/* <Animated.Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]} /> */}
                 <Animated.View style={[styles.backgroundGame, {bottom: backgroundBottomAnimated, right: backgroundRightAnimated}]}>
                     <Image source={require('../../Assets/game/background_game.png')} style={[styles.backgroundGame]} />
                     <Rock />
@@ -1023,7 +998,7 @@ const QuestGameScreen = ({route, navigation}) => {
                 </View>
                 <Character />
                 {flagFirework ? (
-                    <Animated.Image source={require('../../Assets/game/firework.gif')} style={[styles.firework, {top: tempCharaterTopAnimated - 100,left: tempCharaterLeftAnimated}]} />
+                    <Animated.Image source={require('../../Assets/game/firework.gif')} style={[styles.firework, {top: tempCharaterTopAnimated - 70,left: tempCharaterLeftAnimated}]} />
                 ) : (
                     <View></View>
                 )}
